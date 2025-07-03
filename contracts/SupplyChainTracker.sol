@@ -19,6 +19,9 @@ contract SupplyChainTracker {
     // Maps shipmentId to array of checkpoints
     mapping(string => Checkpoint[]) public shipments;
     
+    // Mapping to track authorized validators
+    mapping(address => bool) public authorizedValidators;
+    
     event CheckpointAdded(
         string shipmentId,
         string location,
@@ -29,11 +32,23 @@ contract SupplyChainTracker {
     
     constructor() {
         owner = msg.sender;
+        // Owner is automatically an authorized validator
+        authorizedValidators[owner] = true;
     }
     
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this function");
         _;
+    }
+    
+    modifier onlyAuthorized() {
+        require(authorizedValidators[msg.sender], "Caller is not authorized");
+        _;
+    }
+    
+    // Function to add or remove validators
+    function setValidatorStatus(address _validator, bool _status) public onlyOwner {
+        authorizedValidators[_validator] = _status;
     }
     
     // Function placeholders to be implemented later
@@ -43,8 +58,32 @@ contract SupplyChainTracker {
         string memory _location,
         string memory _status,
         bytes32 _documentHash
-    ) public {
-        // Implementation will come in Phase 2
+    ) public onlyAuthorized {
+        // Input validation
+        require(bytes(_shipmentId).length > 0, "Shipment ID cannot be empty");
+        require(bytes(_location).length > 0, "Location cannot be empty");
+        require(bytes(_status).length > 0, "Status cannot be empty");
+        
+        // Create new checkpoint
+        Checkpoint memory newCheckpoint = Checkpoint({
+            location: _location,
+            timestamp: block.timestamp,
+            validator: msg.sender,
+            status: _status,
+            documentHash: _documentHash
+        });
+        
+        // Add checkpoint to shipment
+        shipments[_shipmentId].push(newCheckpoint);
+        
+        // Emit event
+        emit CheckpointAdded(
+            _shipmentId,
+            _location,
+            block.timestamp,
+            msg.sender,
+            _status
+        );
     }
     
     function getCheckpoints(string memory _shipmentId) public view returns (Checkpoint[] memory) {

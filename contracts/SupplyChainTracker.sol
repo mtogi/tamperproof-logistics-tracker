@@ -1,93 +1,98 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-/**
- * @title SupplyChainTracker
- * @dev A simple contract to track checkpoints in a supply chain
- */
+/// @title SupplyChainTracker
+/// @author Mustafa Toygar Baykal
+/// @notice Tracks verified checkpoints of components on Ethereum
+
 contract SupplyChainTracker {
-    address public owner;
-    
+    // ========== STATE VARIABLES ==========
+
+    address public admin;
+
+    enum Role { None, Manufacturer, Courier, Inspector }
+
+    mapping(address => Role) public roles;
+
     struct Checkpoint {
-        string location;
+        string shipmentId;
         uint256 timestamp;
-        address validator;
-        string status;
-        bytes32 documentHash; // Optional: for IPFS document hash
+        string location;
+        string status; // e.g. "created", "in-transit", "delivered"
+        string documentHash; // Optional IPFS hash or doc ID
+        address submittedBy;
     }
-    
-    // Maps shipmentId to array of checkpoints
-    mapping(string => Checkpoint[]) public shipments;
-    
-    // Mapping to track authorized validators
-    mapping(address => bool) public authorizedValidators;
-    
+
+    mapping(string => Checkpoint[]) private shipmentHistory;
+
+    // ========== EVENTS ==========
+
+    event RoleAssigned(address indexed user, Role role);
     event CheckpointAdded(
-        string shipmentId,
-        string location,
+        string indexed shipmentId,
         uint256 timestamp,
-        address validator,
-        string status
+        string location,
+        string status,
+        address submittedBy
     );
-    
-    constructor() {
-        owner = msg.sender;
-        // Owner is automatically an authorized validator
-        authorizedValidators[owner] = true;
-    }
-    
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Only owner can call this function");
+
+    // ========== MODIFIERS ==========
+
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Only admin can do this");
         _;
     }
-    
+
     modifier onlyAuthorized() {
-        require(authorizedValidators[msg.sender], "Caller is not authorized");
+        require(roles[msg.sender] != Role.None, "Unauthorized: No role assigned");
         _;
     }
-    
-    // Function to add or remove validators
-    function setValidatorStatus(address _validator, bool _status) public onlyOwner {
-        authorizedValidators[_validator] = _status;
+
+    // ========== CONSTRUCTOR ==========
+
+    constructor() {
+        admin = msg.sender;
+        roles[admin] = Role.Inspector; // Admin is also a superuser
     }
-    
-    // Function placeholders to be implemented later
-    
+
+    // ========== ROLE MANAGEMENT ==========
+
+    function assignRole(address user, Role role) external onlyAdmin {
+        roles[user] = role;
+        emit RoleAssigned(user, role);
+    }
+
+    function getRole(address user) external view returns (Role) {
+        return roles[user];
+    }
+
+    // ========== CORE LOGIC ==========
+
     function addCheckpoint(
         string memory _shipmentId,
         string memory _location,
         string memory _status,
-        bytes32 _documentHash
-    ) public onlyAuthorized {
-        // Input validation
-        require(bytes(_shipmentId).length > 0, "Shipment ID cannot be empty");
-        require(bytes(_location).length > 0, "Location cannot be empty");
-        require(bytes(_status).length > 0, "Status cannot be empty");
-        
-        // Create new checkpoint
-        Checkpoint memory newCheckpoint = Checkpoint({
-            location: _location,
+        string memory _documentHash
+    ) external onlyAuthorized {
+        Checkpoint memory cp = Checkpoint({
+            shipmentId: _shipmentId,
             timestamp: block.timestamp,
-            validator: msg.sender,
+            location: _location,
             status: _status,
-            documentHash: _documentHash
+            documentHash: _documentHash,
+            submittedBy: msg.sender
         });
-        
-        // Add checkpoint to shipment
-        shipments[_shipmentId].push(newCheckpoint);
-        
-        // Emit event
-        emit CheckpointAdded(
-            _shipmentId,
-            _location,
-            block.timestamp,
-            msg.sender,
-            _status
-        );
+
+        shipmentHistory[_shipmentId].push(cp);
+
+        emit CheckpointAdded(_shipmentId, block.timestamp, _location, _status, msg.sender);
     }
-    
-    function getCheckpoints(string memory _shipmentId) public view returns (Checkpoint[] memory) {
-        // Implementation will come in Phase 2
-        return shipments[_shipmentId];
+
+    function getShipmentHistory(string memory _shipmentId) external view returns (Checkpoint[] memory) {
+        return shipmentHistory[_shipmentId];
     }
-} 
+
+    function getCheckpointCount(string memory _shipmentId) external view returns (uint256) {
+        return shipmentHistory[_shipmentId].length;
+    }
+}

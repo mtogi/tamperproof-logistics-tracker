@@ -1,0 +1,4 @@
+npx hardhat run scripts/assign_role.js --network localhost
+exit
+npx hardhat run scripts/assign_role.js --network localhost
+node scripts/assign_role.js

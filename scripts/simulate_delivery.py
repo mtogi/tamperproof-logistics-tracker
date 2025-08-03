@@ -41,9 +41,13 @@ except ImportError:
     try:
         from web3.middleware.geth_poa import geth_poa_middleware
     except ImportError:
-        # Fallback - create a simple middleware function
-        def geth_poa_middleware(w3, _):
-            return lambda request, response: response
+        # Fallback - create a simple middleware function that doesn't interfere
+        def geth_poa_middleware(w3=None):
+            def middleware(make_request, web3):
+                def middleware_fn(method, params):
+                    return make_request(method, params)
+                return middleware_fn
+            return middleware
 
 # Load environment variables
 load_dotenv()
@@ -98,9 +102,20 @@ class SupplyChainSimulator:
             # Initialize Web3 connection
             self.w3 = Web3(Web3.HTTPProvider(rpc_url))
             
-            # Add PoA middleware for some testnets (like Goerli, Sepolia)
-            if 'goerli' in rpc_url.lower() or 'sepolia' in rpc_url.lower():
-                self.w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+            # Add PoA middleware for Goerli (Sepolia usually works without it)
+            if 'goerli' in rpc_url.lower():
+                try:
+                    if hasattr(geth_poa_middleware, '__call__'):
+                        middleware = geth_poa_middleware(self.w3)
+                    else:
+                        middleware = geth_poa_middleware
+                    self.w3.middleware_onion.inject(middleware, layer=0)
+                    print("✅ PoA middleware injected for Goerli")
+                except Exception as e:
+                    print(f"⚠️  Could not inject PoA middleware: {e}")
+                    print("🔄 Continuing without middleware...")
+            elif 'sepolia' in rpc_url.lower():
+                print("🔧 Using Sepolia testnet (no additional middleware needed)")
             
             # Test connection
             if not self.w3.is_connected():

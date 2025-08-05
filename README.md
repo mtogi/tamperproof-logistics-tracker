@@ -86,19 +86,19 @@ Contract Address: `0xC9A0B51D65BC2E11cE056594D585FAAdBD3c22De`
 ## 📸 Screenshots
 
 ### Main Dashboard - Analytics Overview
-![Dashboard Overview](./assets/screenshots/analytics-dashboard.png)
+![Dashboard Overview](./assets/screenshots/analytics_dashboard_page.png)
 *Professional analytics dashboard with real-time blockchain connection, shipment statistics, and status distribution charts*
 
 ### Smart Contract Integration
-![Contract Interaction](./assets/screenshots/add-checkpoint.png)
+![Contract Interaction](./assets/screenshots/add_checkpoint_page.png)
 *Add new checkpoints interface showing Web3 integration, role-based access, and blockchain transaction submission*
 
 ### Real-Time Monitoring
-![Event Monitor](./assets/screenshots/event-monitor.png)
+![Event Monitor](./assets/screenshots/live_event_monitor_page.png)
 *Live blockchain event monitoring with filtering capabilities and real-time updates*
 
 ### Shipment Tracking
-![Shipment History](./assets/screenshots/shipment-history.png)
+![Shipment History](./assets/screenshots/view_shipments_history_page.png)
 *Clean interface for tracking shipment history and checkpoint timeline*
 
 ## 🚀 Quick Start
@@ -406,7 +406,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Mustafa Toygar Baykal**
 - GitHub: [@mtogi](https://github.com/mtogi)
-- LinkedIn: [Mustafa Baykal](https://linkedin.com/in/mbaykal)
+- LinkedIn: [Mustafa Toygar Baykal](https://linkedin.com/in/mbaykal)
 - Email: mtoygarby@gmail.com
 
 ## 🙏 Acknowledgments

@@ -398,9 +398,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Author
 
 **Mustafa Toygar Baykal**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
+- GitHub: [@mtogi](https://github.com/mtogi)
+- LinkedIn: [Mustafa Toygar Baykal](https://linkedin.com/in/mbaykal)
+- Email: mtoygarby@gmail.com
 
 ## 🙏 Acknowledgments
 
@@ -425,8 +425,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ for secure, transparent supply chain management**
 
-[⭐ Star this repo](https://github.com/yourusername/tamperproof-logistics-tracker/stargazers) • 
-[🐛 Report Bug](https://github.com/yourusername/tamperproof-logistics-tracker/issues) • 
-[✨ Request Feature](https://github.com/yourusername/tamperproof-logistics-tracker/issues)
+[⭐ Star this repo](https://github.com/mtogi/tamperproof-logistics-tracker/stargazers) • 
+[🐛 Report Bug](https://github.com/mtogi/tamperproof-logistics-tracker/issues) • 
+[✨ Request Feature](https://github.com/mtogi/tamperproof-logistics-tracker/issues)
 
 </div>

@@ -85,16 +85,21 @@ Contract Address: `0xC9A0B51D65BC2E11cE056594D585FAAdBD3c22De`
 
 ## 📸 Screenshots
 
-> **Note**: Add screenshots to showcase your application
+### Main Dashboard - Analytics Overview
+![Dashboard Overview](./assets/screenshots/analytics-dashboard.png)
+*Professional analytics dashboard with real-time blockchain connection, shipment statistics, and status distribution charts*
 
-![Dashboard Overview](./assets/dashboard-overview.png)
-*Main dashboard showing real-time shipment tracking*
+### Smart Contract Integration
+![Contract Interaction](./assets/screenshots/add-checkpoint.png)
+*Add new checkpoints interface showing Web3 integration, role-based access, and blockchain transaction submission*
 
-![Checkpoint Timeline](./assets/checkpoint-timeline.png)
-*Detailed checkpoint timeline with status updates*
+### Real-Time Monitoring
+![Event Monitor](./assets/screenshots/event-monitor.png)
+*Live blockchain event monitoring with filtering capabilities and real-time updates*
 
-![Contract Interaction](./assets/contract-interaction.png)
-*Smart contract interaction interface*
+### Shipment Tracking
+![Shipment History](./assets/screenshots/shipment-history.png)
+*Clean interface for tracking shipment history and checkpoint timeline*
 
 ## 🚀 Quick Start
 
@@ -107,7 +112,7 @@ Contract Address: `0xC9A0B51D65BC2E11cE056594D585FAAdBD3c22De`
 ### One-Command Setup
 ```bash
 # Clone and setup the project
-git clone https://github.com/yourusername/tamperproof-logistics-tracker
+git clone https://github.com/mtogi/tamperproof-logistics-tracker
 cd tamperproof-logistics-tracker
 
 # Install dependencies
@@ -129,7 +134,7 @@ streamlit run streamlit_app/app.py
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/tamperproof-logistics-tracker
+git clone https://github.com/mtogi/tamperproof-logistics-tracker
 cd tamperproof-logistics-tracker
 ```
 
@@ -161,7 +166,7 @@ Edit `.env` with your configuration:
 RPC_URL=https://sepolia.infura.io/v3/YOUR_PROJECT_ID
 
 # Your wallet private key (testnet only!)
-PRIVATE_KEY=your_sepolia_testnet_private_key
+PRIVATE_KEY=your_private_key_here
 
 # Deployed contract address
 CONTRACT_ADDRESS=0xC9A0B51D65BC2E11cE056594D585FAAdBD3c22De
@@ -400,9 +405,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 👨‍💻 Author
 
 **Mustafa Toygar Baykal**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
+- GitHub: [@mtogi](https://github.com/mtogi)
+- LinkedIn: [Mustafa Baykal](https://linkedin.com/in/mbaykal)
+- Email: mtoygarby@gmail.com
 
 ## 🙏 Acknowledgments
 
@@ -427,8 +432,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ for secure, transparent supply chain management**
 
-[⭐ Star this repo](https://github.com/yourusername/tamperproof-logistics-tracker/stargazers) • 
-[🐛 Report Bug](https://github.com/yourusername/tamperproof-logistics-tracker/issues) • 
-[✨ Request Feature](https://github.com/yourusername/tamperproof-logistics-tracker/issues)
+[⭐ Star this repo](https://github.com/mtogi/tamperproof-logistics-tracker/stargazers) • 
+[🐛 Report Bug](https://github.com/mtogi/tamperproof-logistics-tracker/issues) • 
+[✨ Request Feature](https://github.com/mtogi/tamperproof-logistics-tracker/issues)
 
 </div>

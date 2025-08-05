@@ -69,13 +69,27 @@ class Web3Manager:
             st.error(f"❌ Error loading configuration: {str(e)}")
     
     def connect(self) -> bool:
-        """Establish Web3 connection and load contract"""
+        """Establish Web3 connection and load contract with enhanced error handling"""
         try:
+            # Validate configuration before attempting connection
+            if not self.rpc_url:
+                st.error("❌ RPC_URL not configured. Please check your .env file.")
+                return False
+                
+            if not self.private_key:
+                st.error("❌ PRIVATE_KEY not configured. Please check your .env file.")
+                return False
+                
+            if not self.contract_address:
+                st.error("❌ CONTRACT_ADDRESS not configured. Please check your .env file.")
+                return False
+            
             # Connect to Web3 provider
             self.w3 = Web3(Web3.HTTPProvider(self.rpc_url))
             
             if not self.w3.is_connected():
                 st.error(f"❌ Failed to connect to blockchain at {self.rpc_url}")
+                st.info("💡 **Troubleshooting:** Check if your RPC endpoint is correct and accessible.")
                 return False
             
             # Load account from private key
@@ -95,7 +109,20 @@ class Web3Manager:
             return True
             
         except Exception as e:
-            st.error(f"❌ Web3 connection error: {str(e)}")
+            st.error(f"❌ **Web3 connection error**")
+            st.error(f"Details: {str(e)}")
+            
+            # Provide specific error guidance
+            error_str = str(e).lower()
+            if "connection" in error_str or "timeout" in error_str:
+                st.info("💡 **Network Issue:** Check your internet connection and RPC endpoint.")
+            elif "private key" in error_str or "account" in error_str:
+                st.info("💡 **Account Issue:** Verify your private key format and account access.")
+            elif "contract" in error_str or "address" in error_str:
+                st.info("💡 **Contract Issue:** Ensure the contract is deployed at the specified address.")
+            else:
+                st.info("💡 **General Issue:** Check your .env configuration and network settings.")
+                
             return False
     
     def _load_contract_abi(self) -> Optional[List]:
@@ -141,9 +168,12 @@ class Web3Manager:
             return {"connected": False, "error": str(e)}
     
     def get_shipment_history(self, shipment_id: str) -> List[Dict]:
-        """Fetch shipment checkpoint history from contract"""
+        """Fetch shipment checkpoint history from contract with enhanced error handling"""
         if not self.contract:
-            raise Exception("Contract not connected")
+            raise Exception("Smart contract not connected. Please reconnect to blockchain.")
+            
+        if not shipment_id or not shipment_id.strip():
+            raise Exception("Shipment ID cannot be empty.")
             
         try:
             # Call the contract function
@@ -165,25 +195,76 @@ class Web3Manager:
             return formatted_checkpoints
             
         except Exception as e:
-            raise Exception(f"Error fetching shipment history: {str(e)}")
+            error_msg = str(e)
+            
+            # Provide more specific error messages
+            if "execution reverted" in error_msg.lower():
+                raise Exception(f"Contract call failed. The shipment ID '{shipment_id}' might not exist or there might be a contract issue.")
+            elif "timeout" in error_msg.lower():
+                raise Exception("Request timeout. The blockchain network might be slow or unresponsive.")
+            elif "connection" in error_msg.lower():
+                raise Exception("Network connection error. Please check your blockchain connection.")
+            else:
+                raise Exception(f"Error fetching shipment history: {error_msg}")
     
     def get_checkpoint_count(self, shipment_id: str) -> int:
-        """Get total number of checkpoints for a shipment"""
+        """Get total number of checkpoints for a shipment with enhanced error handling"""
         if not self.contract:
-            raise Exception("Contract not connected")
+            raise Exception("Smart contract not connected. Please reconnect to blockchain.")
+            
+        if not shipment_id or not shipment_id.strip():
+            raise Exception("Shipment ID cannot be empty.")
             
         try:
-            return self.contract.functions.getCheckpointCount(shipment_id).call()
+            return self.contract.functions.getCheckpointCount(shipment_id.strip()).call()
         except Exception as e:
-            raise Exception(f"Error getting checkpoint count: {str(e)}")
+            error_msg = str(e)
+            
+            if "execution reverted" in error_msg.lower():
+                raise Exception(f"Contract call failed for shipment '{shipment_id}'. This could indicate the contract is not properly deployed.")
+            elif "timeout" in error_msg.lower():
+                raise Exception("Request timeout. The blockchain network might be slow.")
+            else:
+                raise Exception(f"Error getting checkpoint count: {error_msg}")
     
     def add_checkpoint(self, shipment_id: str, location: str, status: str, document_hash: str = "") -> Tuple[bool, str, Dict]:
-        """Add a new checkpoint to the blockchain with detailed transaction info"""
-        if not self.contract or not self.account:
-            return False, "Contract or account not connected", {}
+        """Add a new checkpoint to the blockchain with enhanced error handling and detailed transaction info"""
+        if not self.contract:
+            return False, "Smart contract not connected. Please reconnect to blockchain.", {}
+            
+        if not self.account:
+            return False, "Account not loaded. Please check your private key configuration.", {}
+            
+        # Validate inputs
+        if not shipment_id or not shipment_id.strip():
+            return False, "Shipment ID cannot be empty.", {}
+            
+        if not location or not location.strip():
+            return False, "Location cannot be empty.", {}
+            
+        if not status or not status.strip():
+            return False, "Status cannot be empty.", {}
         
         try:
-            # Build the transaction
+            # Check account balance before transaction
+            balance = self.w3.eth.get_balance(self.account.address)
+            estimated_cost = 2000000 * self.w3.to_wei('20', 'gwei')
+            
+            if balance < estimated_cost:
+                balance_eth = self.w3.from_wei(balance, 'ether')
+                required_eth = self.w3.from_wei(estimated_cost, 'ether')
+                return False, f"Insufficient balance. Have: {balance_eth:.6f} ETH, Need: ~{required_eth:.6f} ETH", {}
+            
+            # Build the transaction with better gas estimation
+            try:
+                # Try to estimate gas more accurately
+                gas_estimate = self.contract.functions.addCheckpoint(
+                    shipment_id, location, status, document_hash
+                ).estimate_gas({'from': self.account.address})
+                gas_limit = int(gas_estimate * 1.2)  # Add 20% buffer
+            except Exception:
+                gas_limit = 2000000  # Fallback to default
+            
             transaction = self.contract.functions.addCheckpoint(
                 shipment_id,
                 location,
@@ -192,7 +273,7 @@ class Web3Manager:
             ).build_transaction({
                 'from': self.account.address,
                 'nonce': self.w3.eth.get_transaction_count(self.account.address),
-                'gas': 2000000,
+                'gas': gas_limit,
                 'gasPrice': self.w3.to_wei('20', 'gwei')
             })
             
@@ -219,19 +300,48 @@ class Web3Manager:
                 return False, f"Transaction failed.", tx_details
                 
         except Exception as e:
-            return False, f"Transaction error: {str(e)}", {}
+            error_msg = str(e)
+            
+            # Provide specific error messages based on error type
+            if "insufficient funds" in error_msg.lower():
+                return False, "Insufficient funds for gas. Please add ETH to your account.", {}
+            elif "nonce" in error_msg.lower():
+                return False, "Transaction nonce error. Please try again.", {}
+            elif "gas" in error_msg.lower():
+                return False, "Gas estimation failed. The transaction might be invalid.", {}
+            elif "revert" in error_msg.lower():
+                return False, "Transaction reverted. Check your permissions and input data.", {}
+            elif "unauthorized" in error_msg.lower() or "role" in error_msg.lower():
+                return False, "Unauthorized: Your account may not have the required role permissions.", {}
+            else:
+                return False, f"Transaction error: {error_msg}", {}
     
     def get_user_role(self, address: str) -> str:
-        """Get the role of a user address"""
+        """Get the role of a user address with enhanced error handling"""
         if not self.contract:
-            raise Exception("Contract not connected")
+            raise Exception("Smart contract not connected. Please reconnect to blockchain.")
+            
+        if not address or not address.strip():
+            raise Exception("Address cannot be empty.")
             
         try:
-            role_num = self.contract.functions.getRole(Web3.to_checksum_address(address)).call()
+            # Validate address format
+            checksum_address = Web3.to_checksum_address(address.strip())
+            role_num = self.contract.functions.getRole(checksum_address).call()
             role_names = {0: "None", 1: "Manufacturer", 2: "Courier", 3: "Inspector"}
             return role_names.get(role_num, "Unknown")
+        except ValueError as e:
+            if "address" in str(e).lower():
+                raise Exception(f"Invalid Ethereum address format: {address}")
+            else:
+                raise Exception(f"Address validation error: {str(e)}")
         except Exception as e:
-            raise Exception(f"Error getting user role: {str(e)}")
+            error_msg = str(e)
+            
+            if "execution reverted" in error_msg.lower():
+                raise Exception(f"Contract call failed. The address '{address}' might not be valid or the contract might have an issue.")
+            else:
+                raise Exception(f"Error getting user role: {error_msg}")
     
     @staticmethod
     def _format_timestamp(timestamp: int) -> str:
@@ -325,7 +435,12 @@ class Web3Manager:
             return formatted_events
             
         except Exception as e:
-            st.warning(f"Could not fetch events: {str(e)}")
+            error_msg = str(e)
+            
+            # Don't spam with errors, just log and return empty
+            if "timeout" not in error_msg.lower() and "connection" not in error_msg.lower():
+                st.warning(f"Could not fetch events: {error_msg}")
+                
             return []
     
     def listen_for_new_events(self, callback_function=None, poll_interval: int = 5):

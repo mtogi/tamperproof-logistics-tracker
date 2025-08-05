@@ -1,8 +1,12 @@
 """
 Tamper-Proof Component Logistics Tracker - Streamlit Frontend
-Day 7: Web3 Integration Dashboard
+Day 10: Production-Ready Dashboard with Enhanced UX
 
-Connects to deployed SupplyChainTracker smart contract via Web3.py
+A comprehensive blockchain-based logistics tracking system with:
+- Real-time checkpoint monitoring
+- Secure Web3 integration  
+- Enhanced error handling and user feedback
+- Professional UI/UX design
 """
 
 import streamlit as st
@@ -67,7 +71,7 @@ def main():
     
     # Header
     st.markdown('<h1 class="main-header">📦 Tamper-Proof Logistics Tracker</h1>', unsafe_allow_html=True)
-    st.markdown("**Day 8: Live Events & Enhanced UX** - Real-time blockchain monitoring with auto-refresh", unsafe_allow_html=True)
+    st.markdown("**Day 10: Production-Ready System** - Enhanced reliability, validation, and user experience", unsafe_allow_html=True)
     
     # Initialize Web3 manager
     w3_manager = get_web3_manager()
@@ -116,23 +120,25 @@ def main():
             st.rerun()
         
         # Display recent events
-        try:
-            recent_events = w3_manager.get_recent_events(limit=5)
-            if recent_events:
-                st.markdown("**Recent Activity:**")
-                for event in recent_events[-3:]:  # Show last 3
-                    with st.container():
-                        st.markdown(f"""
-                        <div style="font-size: 0.8em; padding: 0.5rem; margin: 0.2rem 0; background-color: #f0f2f6; border-radius: 5px; border-left: 3px solid #1f77b4;">
-                        📦 <strong>{event['shipmentId']}</strong><br>
-                        📍 {event['location']} → {event['status']}<br>
-                        🕒 {event['relative_time']}
-                        </div>
-                        """, unsafe_allow_html=True)
-            else:
-                st.info("No recent events found")
-        except Exception as e:
-            st.warning(f"Could not load events: {str(e)}")
+        with st.spinner("🔍 Loading recent activity..."):
+            try:
+                recent_events = w3_manager.get_recent_events(limit=5)
+                if recent_events:
+                    st.markdown("**📈 Recent Activity:**")
+                    for event in recent_events[-3:]:  # Show last 3
+                        with st.container():
+                            st.markdown(f"""
+                            <div style="font-size: 0.8em; padding: 0.5rem; margin: 0.2rem 0; background-color: #f0f2f6; border-radius: 5px; border-left: 3px solid #1f77b4;">
+                            📦 <strong>{event['shipmentId']}</strong><br>
+                            📍 {event['location']} → {event['status']}<br>
+                            🕒 {event['relative_time']}
+                            </div>
+                            """, unsafe_allow_html=True)
+                else:
+                    st.info("📦 No recent events found. Create some checkpoints to see activity here!")
+            except Exception as e:
+                st.warning(f"⚠️ Could not load events: {str(e)}")
+                st.info("💡 **Tip:** Make sure your blockchain connection is active and the contract is deployed.")
         
         st.markdown("---")
         
@@ -176,7 +182,7 @@ def view_shipment_history_page(w3_manager):
             shipment_id = st.text_input(
                 "Shipment ID",
                 value=default_shipment,
-                placeholder="e.g., SHIP-001, PKG-2024-001",
+                placeholder="e.g., SHIP-2024-001, PKG-ABC123",
                 help="Enter the unique identifier for the shipment"
             )
         
@@ -188,14 +194,22 @@ def view_shipment_history_page(w3_manager):
     if default_shipment and submitted:
         st.session_state.view_shipment_id = ''
     
-    if submitted and shipment_id:
+    if submitted:
+        # Validate input
+        if not shipment_id or not shipment_id.strip():
+            st.error("❌ Please enter a valid shipment ID")
+            return
+            
+        shipment_id = shipment_id.strip()
+        
         with st.spinner(f"Fetching history for {shipment_id}..."):
             try:
                 # Get checkpoint count first
                 count = w3_manager.get_checkpoint_count(shipment_id)
                 
                 if count == 0:
-                    st.warning(f"⚠️ No checkpoints found for shipment ID: `{shipment_id}`")
+                    st.warning(f"📦 **Shipment not found**")
+                    st.info(f"No checkpoints exist for shipment ID: `{shipment_id}`. This shipment may not have been created yet or the ID might be incorrect.")
                     return
                 
                 # Fetch full history
@@ -244,7 +258,18 @@ def view_shipment_history_page(w3_manager):
                     )
                 
             except Exception as e:
-                st.error(f"❌ Error fetching shipment history: {str(e)}")
+                st.error(f"❌ **Error fetching shipment history**")
+                st.error(f"Details: {str(e)}")
+                
+                # Provide troubleshooting tips
+                with st.expander("🔧 Troubleshooting Tips"):
+                    st.markdown("""
+                    **Common issues:**
+                    - Make sure the blockchain connection is active
+                    - Verify the shipment ID is correct (case-sensitive)
+                    - Check if the contract is properly deployed
+                    - Ensure your RPC endpoint is responsive
+                    """)
 
 def add_checkpoint_page(w3_manager):
     """Page for adding new checkpoints"""
@@ -272,7 +297,7 @@ def add_checkpoint_page(w3_manager):
         # Form fields
         shipment_id = st.text_input(
             "Shipment ID *",
-            placeholder="e.g., SHIP-001",
+            placeholder="e.g., SHIP-2024-001",
             help="Unique identifier for the shipment"
         )
         
@@ -314,9 +339,26 @@ def add_checkpoint_page(w3_manager):
     
     # Handle submission
     if submitted:
-        if not all([shipment_id, location, status]):
-            st.error("❌ Please fill in all required fields (marked with *)")
+        # Comprehensive validation
+        validation_errors = []
+        
+        if not shipment_id or not shipment_id.strip():
+            validation_errors.append("Shipment ID is required")
+        if not location or not location.strip():
+            validation_errors.append("Location is required")
+        if not status:
+            validation_errors.append("Status is required")
+            
+        if validation_errors:
+            st.error("❌ **Validation Failed:**")
+            for error in validation_errors:
+                st.error(f"• {error}")
             return
+            
+        # Clean input data
+        shipment_id = shipment_id.strip()
+        location = location.strip()
+        document_hash = document_hash.strip() if document_hash else ""
         
         # Store form data in session state for persistence through rerun
         st.session_state.pending_checkpoint = {
@@ -408,15 +450,10 @@ def add_checkpoint_page(w3_manager):
             
             st.balloons()
             
-            # Auto-refresh: reload shipment history
-            if st.button("🔄 View Updated History") or st.session_state.get('auto_refresh', False):
+                # Auto-refresh: reload shipment history
+            if st.button("🔄 View Updated History"):
                 st.session_state.view_shipment_id = pending['shipment_id']
-                st.session_state.auto_refresh = False
-                st.switch_page("🔍 View Shipment History") if hasattr(st, 'switch_page') else st.info("Click 'View Shipment History' to see the update")
-            
-            if st.button("🔄 Auto-Refresh History"):
-                st.session_state.auto_refresh = True
-                st.rerun()
+                st.info("💡 Switch to 'View Shipment History' tab to see the updated timeline for this shipment.")
                 
         else:
             st.error(f"❌ {message}")
@@ -432,6 +469,15 @@ def add_checkpoint_page(w3_manager):
             # Show error toast
             if hasattr(st, 'toast'):
                 st.toast('❌ Transaction failed', icon='💥')
+                
+            # Provide actionable error guidance
+            st.markdown("""
+            **What to try next:**
+            - Check your account balance for gas fees
+            - Verify your account has the required role permissions
+            - Try again with a different gas price setting
+            - Check if the shipment ID follows the expected format
+            """)
 
 def analytics_page(w3_manager):
     """Basic analytics page"""
@@ -456,15 +502,31 @@ def analytics_page(w3_manager):
     # Sample shipment lookup
     st.subheader("🔍 Quick Lookup")
     
-    sample_ids = ["SHIP-001", "PKG-2024-001", "DEMO-123"]
-    selected_id = st.selectbox("Try a sample shipment ID:", sample_ids)
+    # Note: Sample IDs shown here are for demonstration only
+    # In production, these would be fetched from actual blockchain data
+    sample_note = st.info("💡 **Note:** Sample lookups require actual shipment data on the blockchain. Create checkpoints first using the 'Add Checkpoint' page.")
     
-    if st.button("🔍 View Sample"):
-        try:
-            count = w3_manager.get_checkpoint_count(selected_id)
-            st.info(f"Shipment `{selected_id}` has {count} checkpoint(s)")
-        except Exception as e:
-            st.warning(f"No data found for `{selected_id}`: {str(e)}")
+    # Quick lookup by manual entry
+    lookup_id = st.text_input(
+        "Enter a shipment ID to check:",
+        placeholder="Enter an actual shipment ID",
+        help="Enter a shipment ID that has been created on the blockchain"
+    )
+    
+    if st.button("🔍 Check Shipment") and lookup_id.strip():
+        with st.spinner(f"Checking {lookup_id}..."):
+            try:
+                count = w3_manager.get_checkpoint_count(lookup_id.strip())
+                if count > 0:
+                    st.success(f"✅ Shipment `{lookup_id}` has {count} checkpoint(s)")
+                    # Provide link to view full history
+                    if st.button("📋 View Full History"):
+                        st.session_state.view_shipment_id = lookup_id.strip()
+                        st.info("💡 Switch to 'View Shipment History' tab to see the full timeline")
+                else:
+                    st.warning(f"⚠️ No checkpoints found for shipment `{lookup_id}`")
+            except Exception as e:
+                st.error(f"❌ Error checking shipment `{lookup_id}`: {str(e)}")
     
     # Chart placeholder
     st.subheader("📊 Status Distribution")
@@ -572,7 +634,17 @@ def event_monitor_page(w3_manager):
                 """)
                 
         except Exception as e:
-            st.error(f"❌ Error loading events: {str(e)}")
+            st.error(f"❌ **Error loading events**")
+            st.error(f"Details: {str(e)}")
+            
+            with st.expander("🔧 Troubleshooting"):
+                st.markdown("""
+                **Possible solutions:**
+                - Check blockchain connection status in sidebar
+                - Verify contract deployment and address
+                - Try reducing the event limit or removing filters
+                - Check if there are any recent transactions
+                """)
     
     # Real-time monitoring section
     st.markdown("---")

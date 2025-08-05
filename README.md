@@ -105,7 +105,7 @@ Contract Address: `0xC9A0B51D65BC2E11cE056594D585FAAdBD3c22De`
 ### One-Command Setup
 ```bash
 # Clone and setup the project
-git clone https://github.com/yourusername/tamperproof-logistics-tracker
+git clone https://github.com/mtogi/tamperproof-logistics-tracker
 cd tamperproof-logistics-tracker
 
 # Install dependencies
@@ -127,7 +127,7 @@ streamlit run streamlit_app/app.py
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/tamperproof-logistics-tracker
+git clone https://github.com/mtogi/tamperproof-logistics-tracker
 cd tamperproof-logistics-tracker
 ```
 

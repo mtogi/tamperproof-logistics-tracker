@@ -85,8 +85,6 @@ Contract Address: `0xC9A0B51D65BC2E11cE056594D585FAAdBD3c22De`
 
 ## 📸 Screenshots
 
-> **Note**: Add screenshots to showcase your application
-
 ![Dashboard Overview](./assets/dashboard-overview.png)
 *Main dashboard showing real-time shipment tracking*
 

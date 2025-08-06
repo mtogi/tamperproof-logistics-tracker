@@ -10,7 +10,19 @@ A blockchain-based prototype that logs component handoffs in a secure, verifiabl
 
 ## 🌟 Live Demo
 
-**Smart Contract on Sepolia Testnet:**  
+### 🎬 Video Demonstration
+> **Coming Soon!** Demo video will be embedded here after recording
+
+### 🌐 Interactive Web App
+🚀 **[Try Live App on Streamlit Cloud →](https://your-app-name.streamlit.app)**
+
+### 📱 Features Demo
+- ✅ Real-time blockchain connection
+- ✅ Live checkpoint creation
+- ✅ Shipment history tracking  
+- ✅ Event monitoring dashboard
+
+### ⛓️ Smart Contract on Sepolia Testnet
 🔗 [View on Etherscan](https://sepolia.etherscan.io/address/0xC9A0B51D65BC2E11cE056594D585FAAdBD3c22De)
 
 Contract Address: `0xC9A0B51D65BC2E11cE056594D585FAAdBD3c22De`
@@ -338,10 +350,25 @@ streamlit run streamlit_app/app.py
 ```
 
 #### Production Deployment (Streamlit Cloud)
-1. Fork this repository
-2. Connect to [Streamlit Cloud](https://streamlit.io/cloud)
-3. Add environment variables in the Streamlit Cloud dashboard
-4. Deploy with one click
+
+📖 **[Complete Deployment Guide →](streamlit_cloud_deployment.md)**
+
+**Quick Steps:**
+1. 🍴 Fork this repository to your GitHub
+2. 🌐 Go to [streamlit.io/cloud](https://streamlit.io/cloud) 
+3. 🔗 Connect your GitHub repo
+4. ⚙️ Set **Main file**: `streamlit_app/app.py`
+5. 🔐 Add secrets in **Settings** → **Secrets**:
+   ```toml
+   RPC_URL = "https://sepolia.infura.io/v3/YOUR_PROJECT_ID"
+   PRIVATE_KEY = "your_sepolia_testnet_private_key"
+   CONTRACT_ADDRESS = "0xYourContractAddress"
+   ```
+6. 🚀 Deploy!
+
+**Sample Configuration**: See [`public_demo.env`](public_demo.env) for deployment template
+
+**Your app will be live at**: `https://your-app-name.streamlit.app`
 
 ## 📁 Project Structure
 

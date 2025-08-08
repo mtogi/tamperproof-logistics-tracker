@@ -1,6 +1,5 @@
 """
 Tamper-Proof Component Logistics Tracker - Streamlit Frontend
-Day 10: Production-Ready Dashboard with Enhanced UX
 
 A comprehensive blockchain-based logistics tracking system with:
 - Real-time checkpoint monitoring
@@ -18,7 +17,7 @@ from datetime import datetime
 import time
 
 # Import our Web3 utilities
-from web3_utils import get_web3_manager, create_sample_env_file
+from web3_utils import get_web3_manager, create_sample_env_file, clear_web3_manager_cache
 
 # Page configuration
 st.set_page_config(
@@ -28,40 +27,259 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for better styling
+# Enhanced CSS for professional UI/UX with mobile responsiveness
 st.markdown("""
 <style>
+/* Global styles */
 .main-header {
     font-size: 2.5rem;
     color: #1f77b4;
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    font-weight: 600;
+    letter-spacing: -0.5px;
 }
-.status-card {
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-    padding: 1rem;
-    border-radius: 10px;
-    color: white;
+
+/* Improved spacing for form elements */
+.stTextInput > div > div > input {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 2px solid #e0e7ff;
+    transition: all 0.2s ease;
+    font-size: 1rem;
+}
+
+.stTextInput > div > div > input:focus {
+    border-color: #1f77b4;
+    box-shadow: 0 0 0 3px rgba(31, 119, 180, 0.1);
+    outline: none;
+}
+
+.stSelectbox > div > div {
+    padding: 0.5rem 0;
+}
+
+.stButton > button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border: none;
     margin: 0.5rem 0;
 }
+
+.stButton > button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Status cards with better spacing */
+.status-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
+    color: white;
+    margin: 1rem 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.status-card:hover {
+    transform: translateY(-2px);
+}
+
 .success-card {
-    background: linear-gradient(90deg, #56ab2f 0%, #a8e6cf 100%);
-    padding: 1rem;
-    border-radius: 10px;
+    background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
     color: white;
+    margin: 1rem 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
 .error-card {
-    background: linear-gradient(90deg, #ff416c 0%, #ff4b2b 100%);
-    padding: 1rem;
-    border-radius: 10px;
+    background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
     color: white;
+    margin: 1rem 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
+.warning-card {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
+    color: white;
+    margin: 1rem 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.info-card {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
+    color: white;
+    margin: 1rem 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced checkpoint cards */
 .checkpoint-card {
     border-left: 4px solid #1f77b4;
-    padding: 1rem;
-    margin: 0.5rem 0;
-    background-color: #f8f9fa;
-    border-radius: 5px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    background-color: #fafbfc;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.checkpoint-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Form sections with better spacing */
+.form-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin: 1.5rem 0;
+    border: 1px solid #e5e7eb;
+}
+
+.section-header {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+/* Loading spinner styles */
+.loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+    margin: 1rem 0;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 0.75rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .main-header {
+        font-size: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .status-card, .success-card, .error-card, .warning-card, .info-card {
+        padding: 1rem;
+        margin: 0.75rem 0;
+    }
+    
+    .checkpoint-card {
+        padding: 1rem;
+        margin: 0.75rem 0;
+    }
+    
+    .form-section {
+        padding: 1.5rem;
+        margin: 1rem 0;
+    }
+    
+    .stButton > button {
+        width: 100%;
+        padding: 0.875rem 1rem;
+    }
+}
+
+/* Sidebar improvements for mobile */
+@media (max-width: 768px) {
+    .css-1d391kg {
+        padding: 1rem;
+    }
+    
+    .css-1y4p8pa {
+        width: 100%;
+        max-width: none;
+    }
+}
+
+/* Table responsiveness */
+.dataframe {
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .dataframe {
+        font-size: 0.8rem;
+    }
+    
+    .stDataFrame {
+        overflow-x: auto;
+    }
+}
+
+/* Etherscan link styling */
+.etherscan-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin: 0.5rem 0.5rem 0.5rem 0;
+}
+
+.etherscan-link:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    text-decoration: none;
+    color: white;
+}
+
+/* Success feedback styling */
+.success-feedback {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
+    color: white;
+    margin: 1rem 0;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+/* Better spacing for metrics */
+.metric-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin: 0.5rem;
+    border: 1px solid #e5e7eb;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -71,7 +289,6 @@ def main():
     
     # Header
     st.markdown('<h1 class="main-header">📦 Tamper-Proof Logistics Tracker</h1>', unsafe_allow_html=True)
-    st.markdown("**Day 10: Production-Ready System** - Enhanced reliability, validation, and user experience", unsafe_allow_html=True)
     
     # Initialize Web3 manager
     w3_manager = get_web3_manager()
@@ -80,16 +297,35 @@ def main():
     with st.sidebar:
         st.header("🔗 Connection Status")
         
-        # Try to connect on app start
-        if st.button("🔄 Connect to Blockchain", type="primary"):
-            with st.spinner("Connecting..."):
-                if w3_manager.connect():
-                    st.success("✅ Connected!")
-                else:
-                    st.error("❌ Connection failed")
+        # Connection control buttons
+        status = w3_manager.get_connection_status()
+        
+        if status["connected"]:
+            if st.button("🔌 Disconnect from Blockchain", type="secondary"):
+                with st.spinner("Disconnecting..."):
+                    try:
+                        if w3_manager.disconnect():
+                            # Clear the cached Web3Manager instance to ensure clean state
+                            clear_web3_manager_cache()
+                            st.success("✅ Disconnected!")
+                            st.rerun()
+                        else:
+                            st.error("❌ Disconnect failed")
+                    except Exception as e:
+                        st.error(f"❌ Disconnect error: {str(e)}")
+                        # Try to clear cache anyway
+                        clear_web3_manager_cache()
+                        st.rerun()
+        else:
+            if st.button("🔄 Connect to Blockchain", type="primary"):
+                with st.spinner("Connecting..."):
+                    if w3_manager.connect():
+                        st.success("✅ Connected!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Connection failed")
         
         # Display connection status
-        status = w3_manager.get_connection_status()
         if status["connected"]:
             st.markdown(f"""
             <div class="status-card">
@@ -149,10 +385,27 @@ def main():
             ["🔍 View Shipment History", "➕ Add Checkpoint", "📊 Analytics", "🔊 Event Monitor"]
         )
     
-    # Main content area
+    # Main content area with better mobile messaging
     if not status["connected"]:
-        st.warning("⚠️ Please connect to the blockchain first using the sidebar.")
-        st.info("💡 Make sure you have a `.env` file with RPC_URL, PRIVATE_KEY, and CONTRACT_ADDRESS")
+        st.markdown("""
+        <div class="warning-card">
+        <h4 style="margin: 0 0 1rem 0; color: white;">⚠️ Blockchain Connection Required</h4>
+        <p style="margin: 0; color: white; opacity: 0.9;">
+        Please connect to the blockchain first using the sidebar.
+        </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div class="info-card">
+        <h4 style="margin: 0 0 1rem 0; color: white;">💡 Setup Instructions:</h4>
+        <ul style="margin: 0; color: white; opacity: 0.9;">
+        <li>Make sure you have a <code>.env</code> file with RPC_URL, PRIVATE_KEY, and CONTRACT_ADDRESS</li>
+        <li>Click the "Connect to Blockchain" button in the sidebar</li>
+        <li>Check that your network connection is stable</li>
+        </ul>
+        </div>
+        """, unsafe_allow_html=True)
         return
     
     # Route to different pages
@@ -168,8 +421,12 @@ def main():
 def view_shipment_history_page(w3_manager):
     """Page for viewing shipment checkpoint history"""
     
-    st.header("🔍 View Shipment History")
-    st.markdown("Enter a shipment ID to view its complete checkpoint timeline")
+    st.markdown('<h2 class="section-header">🔍 View Shipment History</h2>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="form-section">
+    <p style="margin: 0; color: #6b7280; font-size: 1.1rem;">Enter a shipment ID to view its complete checkpoint timeline and tracking history.</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Check for auto-populated shipment ID from session state
     default_shipment = st.session_state.get('view_shipment_id', '')
@@ -182,8 +439,8 @@ def view_shipment_history_page(w3_manager):
             shipment_id = st.text_input(
                 "Shipment ID",
                 value=default_shipment,
-                placeholder="e.g., SHIP-2024-001, PKG-ABC123",
-                help="Enter the unique identifier for the shipment"
+                placeholder="Shipment-2025-001",
+                help="Enter the unique identifier for the shipment (e.g., Shipment-2025-001, PKG-LOG-5432)"
             )
         
         with col2:
@@ -195,9 +452,14 @@ def view_shipment_history_page(w3_manager):
         st.session_state.view_shipment_id = ''
     
     if submitted:
-        # Validate input
+        # Validate input with friendly error message
         if not shipment_id or not shipment_id.strip():
-            st.error("❌ Please enter a valid shipment ID")
+            st.markdown("""
+            <div class="error-card">
+            <h4 style="margin: 0 0 0.5rem 0; color: white;">📦 Please enter a shipment ID</h4>
+            <p style="margin: 0; color: white; opacity: 0.9;">Enter a shipment ID like "Shipment-2025-001" to view its tracking history.</p>
+            </div>
+            """, unsafe_allow_html=True)
             return
             
         shipment_id = shipment_id.strip()
@@ -208,8 +470,28 @@ def view_shipment_history_page(w3_manager):
                 count = w3_manager.get_checkpoint_count(shipment_id)
                 
                 if count == 0:
-                    st.warning(f"📦 **Shipment not found**")
-                    st.info(f"No checkpoints exist for shipment ID: `{shipment_id}`. This shipment may not have been created yet or the ID might be incorrect.")
+                    st.markdown(f"""
+                    <div class="warning-card">
+                    <h4 style="margin: 0 0 1rem 0; color: white;">📦 Shipment Not Found</h4>
+                    <p style="margin: 0; color: white; opacity: 0.9;">
+                    No checkpoints exist for shipment ID: <strong>{shipment_id}</strong><br>
+                    💡 This shipment may not have been created yet, or the ID might be incorrect.
+                    </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # Suggest similar actions
+                    st.markdown("""
+                    <div class="info-card">
+                    <h4 style="margin: 0 0 1rem 0; color: white;">💡 What you can do:</h4>
+                    <ul style="margin: 0; color: white; opacity: 0.9;">
+                    <li>Double-check the shipment ID spelling</li>
+                    <li>Try a different shipment ID</li>
+                    <li>Create a new checkpoint using the "Add Checkpoint" tab</li>
+                    <li>Check recent activity in the sidebar</li>
+                    </ul>
+                    </div>
+                    """, unsafe_allow_html=True)
                     return
                 
                 # Fetch full history
@@ -218,12 +500,13 @@ def view_shipment_history_page(w3_manager):
                 # Display summary
                 st.success(f"✅ Found {count} checkpoint(s) for shipment `{shipment_id}`")
                 
-                # Display checkpoints in a timeline format
-                st.subheader("📅 Checkpoint Timeline")
+                # Display checkpoints in a timeline format with better mobile layout
+                st.markdown('<h3 class="section-header">📅 Checkpoint Timeline</h3>', unsafe_allow_html=True)
                 
                 for i, checkpoint in enumerate(checkpoints):
                     with st.container():
-                        col1, col2, col3 = st.columns([1, 2, 2])
+                        # Use responsive columns for mobile
+                        col1, col2, col3 = st.columns([1, 3, 2])
                         
                         with col1:
                             st.markdown(f"**#{i+1}**")
@@ -246,59 +529,101 @@ def view_shipment_history_page(w3_manager):
                             **👤 Submitted by:** `{checkpoint['submittedBy'][:10]}...`
                             """)
                 
-                # Export option
-                if st.button("📥 Export as CSV"):
-                    df = pd.DataFrame(checkpoints)
-                    csv = df.to_csv(index=False)
-                    st.download_button(
-                        label="Download CSV",
-                        data=csv,
-                        file_name=f"shipment_{shipment_id}_history.csv",
-                        mime="text/csv"
-                    )
+                # Export option with better mobile layout
+                st.markdown("<br>", unsafe_allow_html=True)
+                col1, col2 = st.columns([1, 1])
+                with col1:
+                    if st.button("📥 Export as CSV", use_container_width=True):
+                        df = pd.DataFrame(checkpoints)
+                        csv = df.to_csv(index=False)
+                        st.download_button(
+                            label="📎 Download CSV",
+                            data=csv,
+                            file_name=f"shipment_{shipment_id}_history.csv",
+                            mime="text/csv",
+                            use_container_width=True
+                        )
                 
             except Exception as e:
-                st.error(f"❌ **Error fetching shipment history**")
-                st.error(f"Details: {str(e)}")
+                st.markdown(f"""
+                <div class="error-card">
+                <h4 style="margin: 0 0 1rem 0; color: white;">❌ Error Loading Shipment History</h4>
+                <p style="margin: 0; color: white; opacity: 0.9;">
+                We encountered an issue while fetching the shipment data.<br>
+                <small>Technical details: {str(e)}</small>
+                </p>
+                </div>
+                """, unsafe_allow_html=True)
                 
                 # Provide troubleshooting tips
-                with st.expander("🔧 Troubleshooting Tips"):
-                    st.markdown("""
-                    **Common issues:**
-                    - Make sure the blockchain connection is active
-                    - Verify the shipment ID is correct (case-sensitive)
-                    - Check if the contract is properly deployed
-                    - Ensure your RPC endpoint is responsive
-                    """)
+                st.markdown("""
+                <div class="info-card">
+                <h4 style="margin: 0 0 1rem 0; color: white;">🔧 Troubleshooting Steps:</h4>
+                <ul style="margin: 0; color: white; opacity: 0.9;">
+                <li>Check that the blockchain connection is active (see sidebar)</li>
+                <li>Verify the shipment ID is correct (case-sensitive)</li>
+                <li>Ensure the smart contract is properly deployed</li>
+                <li>Try refreshing the page if the network is slow</li>
+                </ul>
+                </div>
+                """, unsafe_allow_html=True)
 
 def add_checkpoint_page(w3_manager):
     """Page for adding new checkpoints"""
     
-    st.header("➕ Add New Checkpoint")
-    st.markdown("Submit a new checkpoint to the blockchain")
+    st.markdown('<h2 class="section-header">➕ Add New Checkpoint</h2>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="form-section">
+    <p style="margin: 0; color: #6b7280; font-size: 1.1rem;">Submit a new checkpoint to the blockchain to track your shipment's journey.</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Check user role
     try:
         if w3_manager.account:
             user_role = w3_manager.get_user_role(w3_manager.account.address)
             if user_role == "None":
-                st.warning("⚠️ Your account has no assigned role. Contact the admin to assign a role.")
+                st.markdown("""
+                <div class="warning-card">
+                <h4 style="margin: 0 0 1rem 0; color: white;">⚠️ Account Role Required</h4>
+                <p style="margin: 0; color: white; opacity: 0.9;">
+                Your account has no assigned role. Contact the system administrator to assign a role before adding checkpoints.
+                </p>
+                </div>
+                """, unsafe_allow_html=True)
                 return
             else:
-                st.info(f"👤 Your role: **{user_role}**")
+                st.markdown(f"""
+                <div class="info-card">
+                <p style="margin: 0; color: white;">👤 Your role: <strong>{user_role}</strong></p>
+                </div>
+                """, unsafe_allow_html=True)
     except Exception as e:
-        st.error(f"❌ Error checking user role: {str(e)}")
+        st.markdown(f"""
+        <div class="error-card">
+        <h4 style="margin: 0 0 1rem 0; color: white;">❌ Unable to Check Account Role</h4>
+        <p style="margin: 0; color: white; opacity: 0.9;">
+        We couldn't verify your account permissions. Please check your blockchain connection.
+        <br><small>Technical details: {str(e)}</small>
+        </p>
+        </div>
+        """, unsafe_allow_html=True)
         return
     
-    # Checkpoint form
+    # Enhanced checkpoint form with better styling
+    st.markdown("""
+    <div class="form-section">
+    <h3 class="section-header">📝 Checkpoint Details</h3>
+    """, unsafe_allow_html=True)
+    
     with st.form("add_checkpoint"):
-        st.subheader("📝 Checkpoint Details")
         
         # Form fields
         shipment_id = st.text_input(
             "Shipment ID *",
-            placeholder="e.g., SHIP-2024-001",
-            help="Unique identifier for the shipment"
+            placeholder="Shipment-2025-001",
+            help="Unique identifier for the shipment (required)",
+            key="add_checkpoint_shipment_id"
         )
         
         col1, col2 = st.columns(2)
@@ -306,8 +631,9 @@ def add_checkpoint_page(w3_manager):
         with col1:
             location = st.text_input(
                 "Location *",
-                placeholder="e.g., New York Warehouse",
-                help="Current location of the shipment"
+                placeholder="Warehouse #3, New York",
+                help="Current location of the shipment (required)",
+                key="add_checkpoint_location"
             )
         
         with col2:
@@ -319,8 +645,9 @@ def add_checkpoint_page(w3_manager):
         
         document_hash = st.text_input(
             "Document Hash (Optional)",
-            placeholder="e.g., QmXYZ... (IPFS hash)",
-            help="Optional hash of related documents"
+            placeholder="QmNLei78zWmzUdbeRB3CiUfAizWUrbeeZh5K1rhAQKCh51",
+            help="Optional IPFS hash or document reference",
+            key="add_checkpoint_document"
         )
         
         # Preview
@@ -334,31 +661,75 @@ def add_checkpoint_page(w3_manager):
             **Time:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')} *(estimated)*
             """)
         
-        # Submit button
-        submitted = st.form_submit_button("🚀 Submit Checkpoint", type="primary")
+        # Submit button with enhanced styling
+        st.markdown("<br>", unsafe_allow_html=True)
+        submitted = st.form_submit_button("🚀 Submit Checkpoint", type="primary", use_container_width=True)
+    
+    st.markdown("</div>", unsafe_allow_html=True)  # Close form-section
     
     # Handle submission
     if submitted:
-        # Comprehensive validation
+        # Comprehensive validation with better UX
         validation_errors = []
         
         if not shipment_id or not shipment_id.strip():
-            validation_errors.append("Shipment ID is required")
+            validation_errors.append("Please enter a shipment ID")
         if not location or not location.strip():
-            validation_errors.append("Location is required")
+            validation_errors.append("Please enter a location")
         if not status:
-            validation_errors.append("Status is required")
+            validation_errors.append("Please select a status")
             
         if validation_errors:
-            st.error("❌ **Validation Failed:**")
+            st.markdown("""
+            <div class="error-card">
+            <h4 style="margin: 0 0 1rem 0; color: white;">❌ Please Complete All Required Fields</h4>
+            </div>
+            """, unsafe_allow_html=True)
+            
             for error in validation_errors:
-                st.error(f"• {error}")
+                st.markdown(f"""
+                <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 1rem; margin: 0.5rem 0; border-radius: 4px;">
+                <p style="margin: 0; color: #dc2626;">• {error}</p>
+                </div>
+                """, unsafe_allow_html=True)
             return
             
         # Clean input data
         shipment_id = shipment_id.strip()
         location = location.strip()
         document_hash = document_hash.strip() if document_hash else ""
+        
+        # Check for duplicate checkpoint prevention
+        try:
+            # Get latest checkpoint for this shipment
+            latest_checkpoints = w3_manager.get_shipment_history(shipment_id)
+            if latest_checkpoints:
+                latest_checkpoint = latest_checkpoints[-1]  # Get most recent
+                
+                # Check if the latest checkpoint has the same location and status
+                if (latest_checkpoint['location'].lower().strip() == location.lower().strip() and 
+                    latest_checkpoint['status'].lower().strip() == status.lower().strip()):
+                    
+                    st.warning("⚠️ **Duplicate Checkpoint Detected**")
+                    st.markdown(f"""
+                    <div class="warning-card">
+                    <h4 style="margin: 0 0 1rem 0; color: white;">🔄 Last checkpoint for this shipment:</h4>
+                    <p style="margin: 0; color: white; opacity: 0.9;">
+                    📍 Location: {latest_checkpoint['location']}<br>
+                    🏷️ Status: {latest_checkpoint['status']}<br>
+                    🕒 Time: {latest_checkpoint['formatted_time']}
+                    </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    if not st.checkbox("🚀 I want to add this duplicate checkpoint anyway", key="override_duplicate"):
+                        st.info("💡 **Tip:** Try updating the location or status to make it more specific, or check if this checkpoint was already added.")
+                        return
+                    else:
+                        st.info("✅ Proceeding with duplicate checkpoint as requested.")
+        except Exception:
+            # If we can't check for duplicates, continue anyway
+            pass
         
         # Store form data in session state for persistence through rerun
         st.session_state.pending_checkpoint = {
@@ -371,7 +742,7 @@ def add_checkpoint_page(w3_manager):
         # Set state machine flags
         st.session_state.show_confirmation = True
         st.session_state.confirm_submission = False  # Reset confirm flag
-        st.success("✅ Checkpoint data stored. Please confirm to submit to blockchain.")
+        st.success("✅ Checkpoint data validated. Please confirm to submit to blockchain.")
         st.rerun()  # Rerun to show confirmation state
     
     # Show confirmation if we have pending data
@@ -405,6 +776,15 @@ def add_checkpoint_page(w3_manager):
     if st.session_state.get('confirm_submission') == True and st.session_state.get('pending_checkpoint') and not st.session_state.get('show_confirmation'):
         pending = st.session_state.pending_checkpoint
         
+        # Enhanced loading feedback with spinner
+        loading_placeholder = st.empty()
+        loading_placeholder.markdown("""
+        <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <strong>Processing transaction... Please wait</strong>
+        </div>
+        """, unsafe_allow_html=True)
+        
         # Submit to blockchain
         with st.spinner("🔄 Submitting to blockchain..."):
             success, message, tx_details = w3_manager.add_checkpoint(
@@ -414,6 +794,9 @@ def add_checkpoint_page(w3_manager):
                 document_hash=pending['document_hash']
             )
         
+        # Clear loading indicator
+        loading_placeholder.empty()
+        
         # Clear all session state flags and pending data
         st.session_state.confirm_submission = False
         st.session_state.pending_checkpoint = None
@@ -421,11 +804,25 @@ def add_checkpoint_page(w3_manager):
         
         # Display enhanced result
         if success:
-            st.success(f"✅ {message}")
+            # Clear form fields after successful submission
+            if 'add_checkpoint_shipment_id' in st.session_state:
+                del st.session_state['add_checkpoint_shipment_id']
+            if 'add_checkpoint_location' in st.session_state:
+                del st.session_state['add_checkpoint_location']
+            if 'add_checkpoint_document' in st.session_state:
+                del st.session_state['add_checkpoint_document']
             
-            # Show detailed transaction info
+            # Success feedback with enhanced styling
+            st.markdown(f"""
+            <div class="success-feedback">
+            <h3 style="margin: 0 0 1rem 0; color: white;">✅ Checkpoint Added Successfully!</h3>
+            <p style="margin: 0; color: white; opacity: 0.9;">{message}</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Show detailed transaction info with Etherscan link
             if tx_details:
-                with st.expander("📊 Transaction Details"):
+                with st.expander("📊 Transaction Details", expanded=True):
                     col1, col2 = st.columns(2)
                     with col1:
                         st.markdown(f"""
@@ -443,6 +840,28 @@ def add_checkpoint_page(w3_manager):
                         **💰 Gas Price:**  
                         `{tx_details.get('gas_price', 'N/A')} Gwei`
                         """)
+                    
+                    # Add Etherscan link (assuming mainnet/testnet)
+                    if tx_details.get('hash'):
+                        # Detect network for correct Etherscan link
+                        network_prefix = ""
+                        if "sepolia" in w3_manager.rpc_url.lower():
+                            network_prefix = "sepolia."
+                        elif "goerli" in w3_manager.rpc_url.lower():
+                            network_prefix = "goerli."
+                        elif "polygon" in w3_manager.rpc_url.lower():
+                            network_prefix = "polygonscan.com/"
+                            network_prefix = network_prefix.replace("etherscan.io", "polygonscan.com")
+                        
+                        etherscan_url = f"https://{network_prefix}etherscan.io/tx/{tx_details['hash']}"
+                        if "polygonscan.com" in network_prefix:
+                            etherscan_url = f"https://polygonscan.com/tx/{tx_details['hash']}"
+                        
+                        st.markdown(f"""
+                        <a href="{etherscan_url}" target="_blank" class="etherscan-link">
+                        🔍 View on Etherscan
+                        </a>
+                        """, unsafe_allow_html=True)
             
             # Show success toast
             if hasattr(st, 'toast'):
@@ -450,13 +869,23 @@ def add_checkpoint_page(w3_manager):
             
             st.balloons()
             
-                # Auto-refresh: reload shipment history
-            if st.button("🔄 View Updated History"):
-                st.session_state.view_shipment_id = pending['shipment_id']
-                st.info("💡 Switch to 'View Shipment History' tab to see the updated timeline for this shipment.")
+            # Auto-refresh: reload shipment history
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("🔄 View Updated History", type="primary"):
+                    st.session_state.view_shipment_id = pending['shipment_id']
+                    st.info("💡 Switch to 'View Shipment History' tab to see the updated timeline for this shipment.")
+            with col2:
+                if st.button("➕ Add Another Checkpoint"):
+                    st.rerun()
                 
         else:
-            st.error(f"❌ {message}")
+            st.markdown(f"""
+            <div class="error-card">
+            <h3 style="margin: 0 0 1rem 0; color: white;">❌ Transaction Failed</h3>
+            <p style="margin: 0; color: white; opacity: 0.9;">{message}</p>
+            </div>
+            """, unsafe_allow_html=True)
             
             # Show error details if available
             if tx_details and tx_details.get('hash'):
@@ -465,6 +894,20 @@ def add_checkpoint_page(w3_manager):
                     **Transaction Hash:** `{tx_details['hash']}`  
                     **Status:** Failed
                     """)
+                    
+                    # Add Etherscan link for failed transaction too
+                    network_prefix = ""
+                    if "sepolia" in w3_manager.rpc_url.lower():
+                        network_prefix = "sepolia."
+                    elif "goerli" in w3_manager.rpc_url.lower():
+                        network_prefix = "goerli."
+                    
+                    etherscan_url = f"https://{network_prefix}etherscan.io/tx/{tx_details['hash']}"
+                    st.markdown(f"""
+                    <a href="{etherscan_url}" target="_blank" class="etherscan-link">
+                    🔍 View on Etherscan
+                    </a>
+                    """, unsafe_allow_html=True)
             
             # Show error toast
             if hasattr(st, 'toast'):
@@ -472,32 +915,59 @@ def add_checkpoint_page(w3_manager):
                 
             # Provide actionable error guidance
             st.markdown("""
-            **What to try next:**
-            - Check your account balance for gas fees
-            - Verify your account has the required role permissions
-            - Try again with a different gas price setting
-            - Check if the shipment ID follows the expected format
-            """)
+            <div class="info-card">
+            <h4 style="margin: 0 0 1rem 0; color: white;">💡 What to try next:</h4>
+            <ul style="margin: 0; color: white; opacity: 0.9;">
+            <li>Check your account balance for gas fees</li>
+            <li>Verify your account has the required role permissions</li>
+            <li>Try again with a different gas price setting</li>
+            <li>Check if the shipment ID follows the expected format</li>
+            </ul>
+            </div>
+            """, unsafe_allow_html=True)
 
 def analytics_page(w3_manager):
     """Basic analytics page"""
     
-    st.header("📊 Analytics Dashboard")
-    st.markdown("Basic analytics for the logistics system")
+    st.markdown('<h2 class="section-header">📊 Analytics Dashboard</h2>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="form-section">
+    <p style="margin: 0; color: #6b7280; font-size: 1.1rem;">Monitor shipment performance and system statistics.</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Sample analytics (in a real app, you'd aggregate data from multiple shipments)
     st.subheader("📈 Quick Stats")
     
-    col1, col2, col3 = st.columns(3)
+    # Enhanced metrics with mobile-friendly layout
+    col1, col2, col3 = st.columns([1, 1, 1])
     
     with col1:
-        st.metric("🚛 Active Shipments", "42", "+5")
+        st.markdown("""
+        <div class="metric-container">
+        <h3 style="margin: 0 0 0.5rem 0; color: #1f77b4;">🚛 Active Shipments</h3>
+        <p style="margin: 0; font-size: 2rem; font-weight: bold; color: #111827;">42</p>
+        <small style="color: #10b981;">+5 this week</small>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
-        st.metric("✅ Delivered Today", "15", "+3")
+        st.markdown("""
+        <div class="metric-container">
+        <h3 style="margin: 0 0 0.5rem 0; color: #10b981;">✅ Delivered Today</h3>
+        <p style="margin: 0; font-size: 2rem; font-weight: bold; color: #111827;">15</p>
+        <small style="color: #10b981;">+3 from yesterday</small>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col3:
-        st.metric("⚠️ Delayed Shipments", "3", "-1")
+        st.markdown("""
+        <div class="metric-container">
+        <h3 style="margin: 0 0 0.5rem 0; color: #ef4444;">⚠️ Delayed Shipments</h3>
+        <p style="margin: 0; font-size: 2rem; font-weight: bold; color: #111827;">3</p>
+        <small style="color: #ef4444;">-1 resolved</small>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Sample shipment lookup
     st.subheader("🔍 Quick Lookup")
@@ -509,8 +979,9 @@ def analytics_page(w3_manager):
     # Quick lookup by manual entry
     lookup_id = st.text_input(
         "Enter a shipment ID to check:",
-        placeholder="Enter an actual shipment ID",
-        help="Enter a shipment ID that has been created on the blockchain"
+        placeholder="Shipment-2025-001",
+        help="Enter a shipment ID that has been created on the blockchain",
+        key="analytics_lookup_id"
     )
     
     if st.button("🔍 Check Shipment") and lookup_id.strip():
@@ -548,17 +1019,22 @@ def analytics_page(w3_manager):
 def event_monitor_page(w3_manager):
     """Live event monitoring page"""
     
-    st.header("🔊 Live Event Monitor")
-    st.markdown("Real-time monitoring of blockchain events")
+    st.markdown('<h2 class="section-header">🔊 Live Event Monitor</h2>', unsafe_allow_html=True)
+    st.markdown("""
+    <div class="form-section">
+    <p style="margin: 0; color: #6b7280; font-size: 1.1rem;">Monitor real-time blockchain events and shipment activities.</p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # Controls
-    col1, col2, col3 = st.columns([2, 1, 1])
+    # Controls with responsive layout
+    col1, col2, col3 = st.columns([3, 2, 2])
     
     with col1:
         shipment_filter = st.text_input(
             "Filter by Shipment ID (optional)",
-            placeholder="e.g., SHIP-001",
-            help="Leave empty to see all events"
+            placeholder="Shipment-2025-001",
+            help="Leave empty to see all events",
+            key="event_monitor_filter"
         )
     
     with col2:
@@ -573,8 +1049,8 @@ def event_monitor_page(w3_manager):
         st.markdown("<br>", unsafe_allow_html=True)
         auto_refresh = st.checkbox("🔄 Auto-refresh (30s)")
     
-    # Add refresh button
-    if st.button("🔄 Refresh Events", type="primary") or auto_refresh:
+    # Add refresh button with mobile-friendly styling
+    if st.button("🔄 Refresh Events", type="primary", use_container_width=True) or auto_refresh:
         if auto_refresh:
             time.sleep(30)
             st.rerun()
@@ -608,20 +1084,22 @@ def event_monitor_page(w3_manager):
                             """, unsafe_allow_html=True)
                         
                         with col2:
-                            # Action buttons
-                            if st.button(f"📋 View Shipment", key=f"view_{i}"):
+                            # Action buttons with mobile-friendly styling
+                            if st.button(f"📋 View", key=f"view_{i}", use_container_width=True):
                                 st.session_state.view_shipment_id = event['shipmentId']
                                 st.info(f"Switch to 'View Shipment History' and search for: {event['shipmentId']}")
                 
-                # Export events
-                if st.button("📥 Export Events as CSV"):
+                # Export events with mobile-friendly layout
+                st.markdown("<br>", unsafe_allow_html=True)
+                if st.button("📥 Export Events as CSV", use_container_width=True):
                     df = pd.DataFrame(events)
                     csv = df.to_csv(index=False)
                     st.download_button(
-                        label="Download Events CSV",
+                        label="📎 Download Events CSV",
                         data=csv,
                         file_name=f"events_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-                        mime="text/csv"
+                        mime="text/csv",
+                        use_container_width=True
                     )
                     
             else:
@@ -650,7 +1128,7 @@ def event_monitor_page(w3_manager):
     st.markdown("---")
     st.subheader("📡 Real-time Monitoring")
     
-    if st.button("🔴 Start Live Monitoring"):
+    if st.button("🔴 Start Live Monitoring", use_container_width=True):
         st.info("🔄 Live monitoring would start here (requires WebSocket or polling)")
         st.markdown("""
         **Note:** Full real-time monitoring requires:

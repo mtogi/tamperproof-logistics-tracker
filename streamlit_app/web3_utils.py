@@ -143,6 +143,17 @@ class Web3Manager:
             st.error(f"❌ Error loading contract ABI: {str(e)}")
             return None
     
+    def disconnect(self) -> bool:
+        """Disconnect from blockchain and clear connection state"""
+        try:
+            self.w3 = None
+            self.contract = None
+            self.account = None
+            return True
+        except Exception as e:
+            st.error(f"❌ Error during disconnect: {str(e)}")
+            return False
+    
     def get_connection_status(self) -> Dict[str, any]:
         """Get current connection status for display"""
         if not self.w3:
@@ -489,6 +500,16 @@ class Web3Manager:
 def get_web3_manager():
     """Get or create Web3Manager instance with Streamlit caching"""
     return Web3Manager()
+
+# Function to clear the cached Web3Manager (useful for disconnect)
+def clear_web3_manager_cache():
+    """Clear the cached Web3Manager instance"""
+    try:
+        get_web3_manager.clear()
+        return True
+    except Exception as e:
+        print(f"Error clearing cache: {e}")
+        return False
 
 
 def create_sample_env_file():

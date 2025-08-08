@@ -241,25 +241,86 @@ st.markdown("""
     }
 }
 
-/* Etherscan link styling */
+/* Modal overlay and dialog styling */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.modal-dialog {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.dimmed-content {
+    opacity: 0.3;
+    pointer-events: none;
+    filter: blur(2px);
+    transition: all 0.3s ease;
+}
+
+/* Enhanced Etherscan link styling for better visibility */
 .etherscan-link {
     display: inline-flex;
     align-items: center;
-    padding: 0.5rem 1rem;
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    margin: 0.5rem 0.5rem 0.5rem 0;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white !important;
+    text-decoration: none !important;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    margin: 1rem 0.5rem 1rem 0;
+    border: 2px solid #1d4ed8;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
 }
 
 .etherscan-link:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    text-decoration: none;
-    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.5);
+    text-decoration: none !important;
+    color: white !important;
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    border-color: #1e40af;
+}
+
+.etherscan-link:visited {
+    color: white !important;
+    text-decoration: none !important;
+}
+
+.etherscan-link:active {
+    color: white !important;
+    text-decoration: none !important;
 }
 
 /* Success feedback styling */
@@ -380,10 +441,33 @@ def main():
         
         # Navigation
         st.header("📋 Navigation")
-        page = st.selectbox(
-            "Choose a page:",
-            ["🔍 View Shipment History", "➕ Add Checkpoint", "📊 Analytics", "🔊 Event Monitor"]
-        )
+        
+        # Initialize page in session state if not exists
+        if 'current_page' not in st.session_state:
+            st.session_state.current_page = "🔍 View Shipment History"
+        
+        # Classic navigation buttons
+        if st.button("🔍 View Shipment History", use_container_width=True, 
+                    type="primary" if st.session_state.current_page == "🔍 View Shipment History" else "secondary"):
+            st.session_state.current_page = "🔍 View Shipment History"
+            st.rerun()
+            
+        if st.button("➕ Add Checkpoint", use_container_width=True,
+                    type="primary" if st.session_state.current_page == "➕ Add Checkpoint" else "secondary"):
+            st.session_state.current_page = "➕ Add Checkpoint"
+            st.rerun()
+            
+        if st.button("📊 Analytics", use_container_width=True,
+                    type="primary" if st.session_state.current_page == "📊 Analytics" else "secondary"):
+            st.session_state.current_page = "📊 Analytics"
+            st.rerun()
+            
+        if st.button("🔊 Event Monitor", use_container_width=True,
+                    type="primary" if st.session_state.current_page == "🔊 Event Monitor" else "secondary"):
+            st.session_state.current_page = "🔊 Event Monitor"
+            st.rerun()
+        
+        page = st.session_state.current_page
     
     # Main content area with better mobile messaging
     if not status["connected"]:
@@ -529,20 +613,7 @@ def view_shipment_history_page(w3_manager):
                             **👤 Submitted by:** `{checkpoint['submittedBy'][:10]}...`
                             """)
                 
-                # Export option with better mobile layout
-                st.markdown("<br>", unsafe_allow_html=True)
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    if st.button("📥 Export as CSV", use_container_width=True):
-                        df = pd.DataFrame(checkpoints)
-                        csv = df.to_csv(index=False)
-                        st.download_button(
-                            label="📎 Download CSV",
-                            data=csv,
-                            file_name=f"shipment_{shipment_id}_history.csv",
-                            mime="text/csv",
-                            use_container_width=True
-                        )
+                # Removed CSV export functionality as requested for MVP
                 
             except Exception as e:
                 st.markdown(f"""
@@ -637,10 +708,13 @@ def add_checkpoint_page(w3_manager):
             )
         
         with col2:
-            status = st.selectbox(
-                "Status *",
+            st.markdown("**Status ***")
+            status = st.radio(
+                "Choose the current status of the shipment:",
                 options=["created", "in-transit", "customs", "delivered", "damaged", "delayed"],
-                help="Current status of the shipment"
+                key="add_checkpoint_status",
+                index=0,
+                help="Select the current status of the shipment"
             )
         
         document_hash = st.text_input(
@@ -745,32 +819,84 @@ def add_checkpoint_page(w3_manager):
         st.success("✅ Checkpoint data validated. Please confirm to submit to blockchain.")
         st.rerun()  # Rerun to show confirmation state
     
-    # Show confirmation if we have pending data
+    # Show enhanced confirmation dialog if we have pending data
     if st.session_state.get('show_confirmation') and st.session_state.get('pending_checkpoint'):
         pending = st.session_state.pending_checkpoint
         
-        st.markdown("### 📝 Review Checkpoint Details")
-        st.markdown(f"""
-        **Shipment ID:** `{pending['shipment_id']}`  
-        **Location:** {pending['location']}  
-        **Status:** {pending['status']}  
-        **Document Hash:** {pending['document_hash'] or 'None'}
-        """)
+        # Add spacing and highlight the review section
+        st.markdown("<br><br>", unsafe_allow_html=True)
         
-        st.warning("⚠️ This will create a blockchain transaction. Click 'Confirm' to proceed.")
+        # Create a prominent review dialog box
+        st.markdown("""
+        <div style="
+            position: relative;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+            border: 3px solid #1f77b4;
+        ">
+            <h3 style="margin: 0 0 1.5rem 0; color: white; text-align: center; font-size: 1.5rem;">
+                📝 Review Checkpoint Details
+            </h3>
+            <div style="
+                background: white;
+                padding: 1.5rem;
+                border-radius: 12px;
+                margin-bottom: 1.5rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            ">
+                <p style="margin: 0.75rem 0; font-size: 1.1rem;"><strong>📦 Shipment ID:</strong> <code style="background: #e5e7eb; padding: 0.25rem 0.5rem; border-radius: 4px;">{}</code></p>
+                <p style="margin: 0.75rem 0; font-size: 1.1rem;"><strong>📍 Location:</strong> {}</p>
+                <p style="margin: 0.75rem 0; font-size: 1.1rem;"><strong>🏷️ Status:</strong> <code style="background: #e5e7eb; padding: 0.25rem 0.5rem; border-radius: 4px;">{}</code></p>
+                <p style="margin: 0.75rem 0; font-size: 1.1rem;"><strong>📄 Document Hash:</strong> <code style="background: #e5e7eb; padding: 0.25rem 0.5rem; border-radius: 4px;">{}</code></p>
+            </div>
+            <div style="
+                background: #fef3cd;
+                padding: 1.25rem;
+                border-radius: 8px;
+                margin-bottom: 1.5rem;
+                border-left: 4px solid #f59e0b;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            ">
+                <p style="margin: 0; color: #92400e; font-weight: 600; text-align: center; font-size: 1.1rem;">
+                    ⚠️ This will create a blockchain transaction. Please confirm to proceed.
+                </p>
+            </div>
+        </div>
+        """.format(
+            pending['shipment_id'],
+            pending['location'],
+            pending['status'],
+            pending['document_hash'] or 'None'
+        ), unsafe_allow_html=True)
         
-        col1, col2 = st.columns(2)
-        with col1:
-            if st.button("✅ Confirm Submission", type="primary"):
-                st.session_state.confirm_submission = True
-                st.session_state.show_confirmation = False
-                st.rerun()
+        # Confirmation buttons in a centered, prominent layout
+        col1, col2, col3 = st.columns([1, 3, 1])
         with col2:
-            if st.button("❌ Cancel"):
-                st.session_state.pending_checkpoint = None
-                st.session_state.show_confirmation = False
-                st.session_state.confirm_submission = False
-                st.rerun()
+            col_confirm, col_cancel = st.columns(2)
+            with col_confirm:
+                if st.button("✅ Confirm Submission", type="primary", use_container_width=True, key="confirm_submit_btn"):
+                    st.session_state.confirm_submission = True
+                    st.session_state.show_confirmation = False
+                    st.rerun()
+            with col_cancel:
+                if st.button("❌ Cancel", use_container_width=True, key="cancel_submit_btn"):
+                    st.session_state.pending_checkpoint = None
+                    st.session_state.show_confirmation = False
+                    st.session_state.confirm_submission = False
+                    st.rerun()
+        
+        # Add visual separation and note
+        st.markdown("""
+        <div style="text-align: center; margin: 2rem 0; color: #6b7280;">
+            <em>📋 Please review the details above before confirming your submission.</em>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Stop further rendering while in confirmation state to hide the form
+        return
     
     # Handle confirmed submission (using session state data)
     if st.session_state.get('confirm_submission') == True and st.session_state.get('pending_checkpoint') and not st.session_state.get('show_confirmation'):
@@ -809,6 +935,8 @@ def add_checkpoint_page(w3_manager):
                 del st.session_state['add_checkpoint_shipment_id']
             if 'add_checkpoint_location' in st.session_state:
                 del st.session_state['add_checkpoint_location']
+            if 'add_checkpoint_status' in st.session_state:
+                del st.session_state['add_checkpoint_status']
             if 'add_checkpoint_document' in st.session_state:
                 del st.session_state['add_checkpoint_document']
             

@@ -969,21 +969,11 @@ def add_checkpoint_page(w3_manager):
                         `{tx_details.get('gas_price', 'N/A')} Gwei`
                         """)
                     
-                    # Add Etherscan link (assuming mainnet/testnet)
+                    # Add Etherscan link to contract address page
                     if tx_details.get('hash'):
-                        # Detect network for correct Etherscan link
-                        network_prefix = ""
-                        if "sepolia" in w3_manager.rpc_url.lower():
-                            network_prefix = "sepolia."
-                        elif "goerli" in w3_manager.rpc_url.lower():
-                            network_prefix = "goerli."
-                        elif "polygon" in w3_manager.rpc_url.lower():
-                            network_prefix = "polygonscan.com/"
-                            network_prefix = network_prefix.replace("etherscan.io", "polygonscan.com")
-                        
-                        etherscan_url = f"https://{network_prefix}etherscan.io/tx/{tx_details['hash']}"
-                        if "polygonscan.com" in network_prefix:
-                            etherscan_url = f"https://polygonscan.com/tx/{tx_details['hash']}"
+                        # Use contract address page instead of transaction page to avoid immediate indexing issues
+                        contract_address = "0xC9A0B51D65BC2E11cE056594D585FAAdBD3c22De"
+                        etherscan_url = f"https://sepolia.etherscan.io/address/{contract_address}"
                         
                         st.markdown(f"""
                         <a href="{etherscan_url}" target="_blank" class="etherscan-link">
@@ -1023,14 +1013,9 @@ def add_checkpoint_page(w3_manager):
                     **Status:** Failed
                     """)
                     
-                    # Add Etherscan link for failed transaction too
-                    network_prefix = ""
-                    if "sepolia" in w3_manager.rpc_url.lower():
-                        network_prefix = "sepolia."
-                    elif "goerli" in w3_manager.rpc_url.lower():
-                        network_prefix = "goerli."
-                    
-                    etherscan_url = f"https://{network_prefix}etherscan.io/tx/{tx_details['hash']}"
+                    # Add Etherscan link to contract address page for failed transaction too
+                    contract_address = "0xC9A0B51D65BC2E11cE056594D585FAAdBD3c22De"
+                    etherscan_url = f"https://sepolia.etherscan.io/address/{contract_address}"
                     st.markdown(f"""
                     <a href="{etherscan_url}" target="_blank" class="etherscan-link">
                     🔍 View on Etherscan

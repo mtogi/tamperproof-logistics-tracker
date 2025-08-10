@@ -35,42 +35,82 @@ st.markdown("""
     font-size: 2.5rem;
     color: #1f77b4;
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 3rem;
+    padding-bottom: 1rem;
     font-weight: 600;
     letter-spacing: -0.5px;
+    border-bottom: 3px solid #e5e7eb;
 }
 
-/* Improved spacing for form elements */
+/* Enhanced spacing for form elements */
+.stTextInput {
+    margin-bottom: 1.5rem;
+}
+
 .stTextInput > div > div > input {
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
     border: 2px solid #e0e7ff;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     font-size: 1rem;
+    background: #fafbfc;
 }
 
 .stTextInput > div > div > input:focus {
     border-color: #1f77b4;
-    box-shadow: 0 0 0 3px rgba(31, 119, 180, 0.1);
+    box-shadow: 0 0 0 4px rgba(31, 119, 180, 0.1);
     outline: none;
+    background: white;
+    transform: translateY(-1px);
+}
+
+.stSelectbox {
+    margin-bottom: 1.5rem;
 }
 
 .stSelectbox > div > div {
-    padding: 0.5rem 0;
+    padding: 0.75rem 0;
+}
+
+.stRadio {
+    margin-bottom: 1.5rem;
+}
+
+.stRadio > div {
+    gap: 1rem;
+}
+
+.stButton {
+    margin: 1rem 0;
 }
 
 .stButton > button {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
+    padding: 1rem 2rem;
+    border-radius: 12px;
     font-weight: 600;
-    transition: all 0.2s ease;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
     border: none;
-    margin: 0.5rem 0;
+    min-height: 3rem;
 }
 
 .stButton > button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Form section improvements */
+.stForm {
+    margin: 2rem 0;
+}
+
+.stForm > div {
+    gap: 1.5rem;
+}
+
+/* Column improvements */
+.stColumns {
+    gap: 2rem;
 }
 
 /* Status cards with better spacing */
@@ -186,31 +226,100 @@ st.markdown("""
     to { transform: rotate(360deg); }
 }
 
-/* Mobile responsiveness */
+/* Enhanced Mobile responsiveness */
 @media (max-width: 768px) {
     .main-header {
-        font-size: 2rem;
-        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        text-align: center;
     }
     
     .status-card, .success-card, .error-card, .warning-card, .info-card {
-        padding: 1rem;
-        margin: 0.75rem 0;
+        padding: 1.25rem;
+        margin: 1rem 0;
+        font-size: 0.95rem;
     }
     
     .checkpoint-card {
-        padding: 1rem;
-        margin: 0.75rem 0;
+        padding: 1.25rem;
+        margin: 1rem 0;
+        font-size: 0.9rem;
     }
     
     .form-section {
-        padding: 1.5rem;
+        padding: 1.5rem 1rem;
         margin: 1rem 0;
     }
     
     .stButton > button {
         width: 100%;
-        padding: 0.875rem 1rem;
+        padding: 1rem;
+        font-size: 1rem;
+        min-height: 3.5rem;
+    }
+    
+    /* Mobile form improvements */
+    .stTextInput > div > div > input {
+        font-size: 1rem;
+        padding: 1rem;
+    }
+    
+    .stSelectbox > div > div > div {
+        font-size: 1rem;
+    }
+    
+    /* Better spacing for mobile forms */
+    .stForm > div {
+        gap: 1rem;
+    }
+    
+    .stColumns {
+        gap: 1rem;
+    }
+    
+    /* Mobile-friendly confirmation dialog */
+    .modal-dialog {
+        margin: 1rem;
+        padding: 1.5rem;
+        max-width: calc(100vw - 2rem);
+    }
+}
+
+/* Extra small devices (phones in portrait) */
+@media (max-width: 480px) {
+    .main-header {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding: 0.75rem;
+    }
+    
+    .form-section {
+        padding: 1rem 0.75rem;
+        margin: 0.75rem 0;
+    }
+    
+    .status-card, .success-card, .error-card, .warning-card, .info-card {
+        padding: 1rem;
+        margin: 0.75rem 0;
+        font-size: 0.9rem;
+    }
+    
+    .checkpoint-card {
+        padding: 1rem;
+        margin: 0.75rem 0;
+        font-size: 0.85rem;
+    }
+    
+    .stButton > button {
+        padding: 0.875rem;
+        font-size: 0.95rem;
+        min-height: 3rem;
+    }
+    
+    .stTextInput > div > div > input {
+        font-size: 0.95rem;
+        padding: 0.875rem;
     }
 }
 
@@ -224,11 +333,18 @@ st.markdown("""
         width: 100%;
         max-width: none;
     }
+    
+    /* Make sidebar more mobile-friendly */
+    .css-1v3fvcr {
+        padding: 0.5rem;
+    }
 }
 
 /* Table responsiveness */
 .dataframe {
     font-size: 0.9rem;
+    width: 100%;
+    max-width: 100%;
 }
 
 @media (max-width: 768px) {
@@ -238,6 +354,21 @@ st.markdown("""
     
     .stDataFrame {
         overflow-x: auto;
+        max-width: 100vw;
+    }
+    
+    .stDataFrame > div {
+        min-width: 600px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dataframe {
+        font-size: 0.75rem;
+    }
+    
+    .stDataFrame > div {
+        min-width: 500px;
     }
 }
 
@@ -291,7 +422,8 @@ st.markdown("""
 .etherscan-link {
     display: inline-flex;
     align-items: center;
-    padding: 0.75rem 1.5rem;
+    justify-content: center;
+    padding: 1rem 1.5rem;
     background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
     color: white !important;
     text-decoration: none !important;
@@ -299,9 +431,11 @@ st.markdown("""
     font-weight: 600;
     font-size: 1rem;
     transition: all 0.3s ease;
-    margin: 1rem 0.5rem 1rem 0;
+    margin: 0.5rem 0.25rem;
     border: 2px solid #1d4ed8;
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    width: 100%;
+    min-height: 3rem;
 }
 
 .etherscan-link:hover {
@@ -321,6 +455,43 @@ st.markdown("""
 .etherscan-link:active {
     color: white !important;
     text-decoration: none !important;
+}
+
+/* Subtle animations for better UX */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stContainer > div {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+/* Enhanced focus states for accessibility */
+.stTextInput > div > div > input:focus,
+.stSelectbox > div > div:focus-within,
+.stButton > button:focus {
+    outline: 3px solid rgba(31, 119, 180, 0.3);
+    outline-offset: 2px;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* Improved divider styling */
+hr {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+    margin: 2rem 0;
 }
 
 /* Success feedback styling */
@@ -523,8 +694,8 @@ def view_shipment_history_page(w3_manager):
             shipment_id = st.text_input(
                 "Shipment ID",
                 value=default_shipment,
-                placeholder="Shipment-2025-001",
-                help="Enter the unique identifier for the shipment (e.g., Shipment-2025-001, PKG-LOG-5432)"
+                placeholder="e.g., SHIP-2025-001, LOGISTICS-PKG-5432, CARGO-NYC-789",
+                help="Enter the unique identifier for the shipment. Examples: SHIP-2025-001, LOGISTICS-PKG-5432, CARGO-NYC-789"
             )
         
         with col2:
@@ -692,8 +863,8 @@ def add_checkpoint_page(w3_manager):
         # Form fields
         shipment_id = st.text_input(
             "Shipment ID *",
-            placeholder="Shipment-2025-001",
-            help="Unique identifier for the shipment (required)",
+            placeholder="e.g., SHIP-2025-001, LOGISTICS-PKG-5432, CARGO-NYC-789",
+            help="Unique identifier for the shipment (required). Use descriptive IDs like SHIP-2025-001 or LOGISTICS-PKG-5432",
             key="add_checkpoint_shipment_id"
         )
         
@@ -702,8 +873,8 @@ def add_checkpoint_page(w3_manager):
         with col1:
             location = st.text_input(
                 "Location *",
-                placeholder="Warehouse #3, New York",
-                help="Current location of the shipment (required)",
+                placeholder="e.g., Amazon Fulfillment Center NYC, Port of Los Angeles, FedEx Hub Memphis",
+                help="Current location of the shipment (required). Be specific: include facility names, cities, or landmarks",
                 key="add_checkpoint_location"
             )
         
@@ -719,8 +890,8 @@ def add_checkpoint_page(w3_manager):
         
         document_hash = st.text_input(
             "Document Hash (Optional)",
-            placeholder="QmNLei78zWmzUdbeRB3CiUfAizWUrbeeZh5K1rhAQKCh51",
-            help="Optional IPFS hash or document reference",
+            placeholder="e.g., QmNLei78zWmzUdbeRB3CiUfAizWUrbeeZh5K1rhAQKCh51, or invoice-2025-001",
+            help="Optional IPFS hash, document reference, or invoice number for verification",
             key="add_checkpoint_document"
         )
         
@@ -756,16 +927,24 @@ def add_checkpoint_page(w3_manager):
         if validation_errors:
             st.markdown("""
             <div class="error-card">
-            <h4 style="margin: 0 0 1rem 0; color: white;">❌ Please Complete All Required Fields</h4>
+            <h4 style="margin: 0 0 1rem 0; color: white;">❌ Oops! We need a bit more information</h4>
+            <p style="margin: 0; color: white; opacity: 0.9;">Please fill in the following required fields to continue:</p>
             </div>
             """, unsafe_allow_html=True)
             
             for error in validation_errors:
                 st.markdown(f"""
-                <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 1rem; margin: 0.5rem 0; border-radius: 4px;">
-                <p style="margin: 0; color: #dc2626;">• {error}</p>
+                <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 1.25rem; margin: 0.75rem 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <p style="margin: 0; color: #dc2626; font-weight: 500;">📝 {error}</p>
                 </div>
                 """, unsafe_allow_html=True)
+            
+            # Add helpful tip
+            st.markdown("""
+            <div style="background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 1.25rem; margin: 1rem 0; border-radius: 8px;">
+            <p style="margin: 0; color: #0c4a6e; font-weight: 500;">💡 <strong>Quick tip:</strong> All fields marked with * are required for blockchain submission</p>
+            </div>
+            """, unsafe_allow_html=True)
             return
             
         # Clean input data
@@ -773,7 +952,7 @@ def add_checkpoint_page(w3_manager):
         location = location.strip()
         document_hash = document_hash.strip() if document_hash else ""
         
-        # Check for duplicate checkpoint prevention
+        # Enhanced duplicate checkpoint prevention
         try:
             # Get latest checkpoint for this shipment
             latest_checkpoints = w3_manager.get_shipment_history(shipment_id)
@@ -784,25 +963,64 @@ def add_checkpoint_page(w3_manager):
                 if (latest_checkpoint['location'].lower().strip() == location.lower().strip() and 
                     latest_checkpoint['status'].lower().strip() == status.lower().strip()):
                     
-                    st.warning("⚠️ **Duplicate Checkpoint Detected**")
+                    # Calculate time difference to provide better context
+                    import time
+                    current_time = int(time.time())
+                    time_diff = current_time - latest_checkpoint['timestamp']
+                    
+                    # Show more prominent duplicate warning with time context
+                    if time_diff < 300:  # Less than 5 minutes
+                        time_context = "just now (less than 5 minutes ago)"
+                        urgency_class = "error-card"
+                    elif time_diff < 3600:  # Less than 1 hour
+                        time_context = f"recently ({time_diff // 60} minutes ago)"
+                        urgency_class = "warning-card"
+                    else:
+                        time_context = f"earlier ({latest_checkpoint['formatted_time']})"
+                        urgency_class = "warning-card"
+                    
                     st.markdown(f"""
-                    <div class="warning-card">
-                    <h4 style="margin: 0 0 1rem 0; color: white;">🔄 Last checkpoint for this shipment:</h4>
+                    <div class="{urgency_class}">
+                    <h4 style="margin: 0 0 1rem 0; color: white;">⚠️ Potential Duplicate Checkpoint Detected</h4>
                     <p style="margin: 0; color: white; opacity: 0.9;">
-                    📍 Location: {latest_checkpoint['location']}<br>
-                    🏷️ Status: {latest_checkpoint['status']}<br>
-                    🕒 Time: {latest_checkpoint['formatted_time']}
+                    A checkpoint with the same location and status was added {time_context}:<br><br>
+                    📍 <strong>Location:</strong> {latest_checkpoint['location']}<br>
+                    🏷️ <strong>Status:</strong> {latest_checkpoint['status']}<br>
+                    🕒 <strong>Time:</strong> {latest_checkpoint['formatted_time']}
                     </p>
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    if not st.checkbox("🚀 I want to add this duplicate checkpoint anyway", key="override_duplicate"):
-                        st.info("💡 **Tip:** Try updating the location or status to make it more specific, or check if this checkpoint was already added.")
+                    # Enhanced override options with better UX
+                    override_choice = st.radio(
+                        "How would you like to proceed?",
+                        options=[
+                            "❌ Cancel - I'll modify the details",
+                            "🚀 Continue anyway - This is intentional",
+                            "✏️ Edit and try again"
+                        ],
+                        key="duplicate_override_choice",
+                        help="Choose the best option for your situation"
+                    )
+                    
+                    if override_choice == "❌ Cancel - I'll modify the details":
+                        st.info("💡 **Suggestion:** Try making the location more specific (e.g., 'Warehouse #3, Loading Dock B') or updating the status if the shipment has progressed.")
                         return
-                    else:
+                    elif override_choice == "✏️ Edit and try again":
+                        # Clear form to encourage editing
+                        for key in ['add_checkpoint_shipment_id', 'add_checkpoint_location', 
+                                   'add_checkpoint_status', 'add_checkpoint_document']:
+                            if key in st.session_state:
+                                del st.session_state[key]
+                        st.info("✏️ Form cleared. Please update the details and try again.")
+                        st.rerun()
+                        return
+                    else:  # Continue anyway
                         st.info("✅ Proceeding with duplicate checkpoint as requested.")
-        except Exception:
-            # If we can't check for duplicates, continue anyway
+                        
+        except Exception as e:
+            # If we can't check for duplicates, log but continue
+            st.warning(f"⚠️ Could not check for duplicates: {str(e)}")
             pass
         
         # Store form data in session state for persistence through rerun
@@ -902,26 +1120,75 @@ def add_checkpoint_page(w3_manager):
     if st.session_state.get('confirm_submission') == True and st.session_state.get('pending_checkpoint') and not st.session_state.get('show_confirmation'):
         pending = st.session_state.pending_checkpoint
         
-        # Enhanced loading feedback with spinner
+        # Enhanced loading feedback with multiple stages
         loading_placeholder = st.empty()
-        loading_placeholder.markdown("""
-        <div class="loading-container">
-        <div class="loading-spinner"></div>
-        <strong>Processing transaction... Please wait</strong>
-        </div>
-        """, unsafe_allow_html=True)
+        progress_bar = st.progress(0)
+        status_text = st.empty()
         
-        # Submit to blockchain
-        with st.spinner("🔄 Submitting to blockchain..."):
+        try:
+            # Stage 1: Validation
+            loading_placeholder.markdown("""
+            <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <strong>🔍 Validating transaction details...</strong>
+            </div>
+            """, unsafe_allow_html=True)
+            progress_bar.progress(20)
+            status_text.info("Step 1/4: Validating transaction parameters")
+            
+            # Stage 2: Building transaction
+            import time
+            time.sleep(0.5)  # Brief pause for UX
+            loading_placeholder.markdown("""
+            <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <strong>📦 Building blockchain transaction...</strong>
+            </div>
+            """, unsafe_allow_html=True)
+            progress_bar.progress(40)
+            status_text.info("Step 2/4: Preparing transaction for blockchain")
+            
+            # Stage 3: Submitting
+            time.sleep(0.5)
+            loading_placeholder.markdown("""
+            <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <strong>🚀 Submitting to blockchain network...</strong>
+            </div>
+            """, unsafe_allow_html=True)
+            progress_bar.progress(60)
+            status_text.info("Step 3/4: Sending to blockchain (this may take 30-60 seconds)")
+            
+            # Submit to blockchain
             success, message, tx_details = w3_manager.add_checkpoint(
                 shipment_id=pending['shipment_id'],
                 location=pending['location'],
                 status=pending['status'],
                 document_hash=pending['document_hash']
             )
+            
+            # Stage 4: Confirming
+            progress_bar.progress(80)
+            status_text.info("Step 4/4: Waiting for blockchain confirmation...")
+            time.sleep(0.5)
+            
+            progress_bar.progress(100)
+            if success:
+                status_text.success("✅ Transaction confirmed on blockchain!")
+            else:
+                status_text.error("❌ Transaction failed")
+            
+        except Exception as e:
+            progress_bar.progress(100)
+            status_text.error(f"❌ Unexpected error: {str(e)}")
+            success, message, tx_details = False, f"Unexpected error: {str(e)}", {}
         
-        # Clear loading indicator
-        loading_placeholder.empty()
+        finally:
+            # Clear loading indicators after a brief display
+            time.sleep(1)
+            loading_placeholder.empty()
+            progress_bar.empty()
+            status_text.empty()
         
         # Clear all session state flags and pending data
         st.session_state.confirm_submission = False
@@ -930,15 +1197,15 @@ def add_checkpoint_page(w3_manager):
         
         # Display enhanced result
         if success:
-            # Clear form fields after successful submission
-            if 'add_checkpoint_shipment_id' in st.session_state:
-                del st.session_state['add_checkpoint_shipment_id']
-            if 'add_checkpoint_location' in st.session_state:
-                del st.session_state['add_checkpoint_location']
-            if 'add_checkpoint_status' in st.session_state:
-                del st.session_state['add_checkpoint_status']
-            if 'add_checkpoint_document' in st.session_state:
-                del st.session_state['add_checkpoint_document']
+            # Clear form fields after successful submission for better UX
+            for key in ['add_checkpoint_shipment_id', 'add_checkpoint_location', 
+                       'add_checkpoint_status', 'add_checkpoint_document']:
+                if key in st.session_state:
+                    del st.session_state[key]
+            
+            # Also clear any override checkbox state
+            if 'override_duplicate' in st.session_state:
+                del st.session_state['override_duplicate']
             
             # Success feedback with enhanced styling
             st.markdown(f"""
@@ -969,16 +1236,37 @@ def add_checkpoint_page(w3_manager):
                         `{tx_details.get('gas_price', 'N/A')} Gwei`
                         """)
                     
-                    # Add Etherscan link to contract address page
+                    # Add Etherscan links for transaction and contract
                     if tx_details.get('hash'):
-                        # Use contract address page instead of transaction page to avoid immediate indexing issues
+                        tx_hash = tx_details['hash']
                         contract_address = "0xC9A0B51D65BC2E11cE056594D585FAAdBD3c22De"
-                        etherscan_url = f"https://sepolia.etherscan.io/address/{contract_address}"
                         
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            tx_url = f"https://sepolia.etherscan.io/tx/{tx_hash}"
+                            st.markdown(f"""
+                            <a href="{tx_url}" target="_blank" class="etherscan-link">
+                            📄 View Transaction
+                            </a>
+                            """, unsafe_allow_html=True)
+                        
+                        with col2:
+                            contract_url = f"https://sepolia.etherscan.io/address/{contract_address}"
+                            st.markdown(f"""
+                            <a href="{contract_url}" target="_blank" class="etherscan-link">
+                            📜 View Contract
+                            </a>
+                            """, unsafe_allow_html=True)
+                        
+                        # Add transaction hash for easy copying
                         st.markdown(f"""
-                        <a href="{etherscan_url}" target="_blank" class="etherscan-link">
-                        🔍 View on Etherscan
-                        </a>
+                        <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; margin: 1rem 0; border: 1px solid #e2e8f0;">
+                        <p style="margin: 0; color: #475569; font-size: 0.9rem;">
+                        <strong>📋 Transaction Hash (click to copy):</strong><br>
+                        <code style="background: #e2e8f0; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; word-break: break-all;">{tx_hash}</code>
+                        </p>
+                        </div>
                         """, unsafe_allow_html=True)
             
             # Show success toast
@@ -1092,8 +1380,8 @@ def analytics_page(w3_manager):
     # Quick lookup by manual entry
     lookup_id = st.text_input(
         "Enter a shipment ID to check:",
-        placeholder="Shipment-2025-001",
-        help="Enter a shipment ID that has been created on the blockchain",
+        placeholder="e.g., SHIP-2025-001, LOGISTICS-PKG-5432, CARGO-NYC-789",
+        help="Enter a shipment ID that has been created on the blockchain. Use the same format as when creating checkpoints",
         key="analytics_lookup_id"
     )
     
@@ -1145,8 +1433,8 @@ def event_monitor_page(w3_manager):
     with col1:
         shipment_filter = st.text_input(
             "Filter by Shipment ID (optional)",
-            placeholder="Shipment-2025-001",
-            help="Leave empty to see all events",
+            placeholder="e.g., SHIP-2025-001, LOGISTICS-PKG-5432",
+            help="Leave empty to see all events, or enter a specific shipment ID to filter",
             key="event_monitor_filter"
         )
     

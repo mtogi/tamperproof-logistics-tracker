@@ -14,7 +14,7 @@ A blockchain-based prototype that logs component handoffs in a secure, verifiabl
 > [www.youtube.com/watch?v=m8_gSPERhB8](https://www.youtube.com/watch?v=m8_gSPERhB8)
 
 ### 🌐 Interactive Web App
-🚀 **[Try Live App on Streamlit Cloud →](https://your-app-name.streamlit.app)**
+🚀 **[Try Live App on Streamlit Cloud →](https://tamperproofchain.streamlit.app)**
 
 ### 📱 Features Demo
 - ✅ Real-time blockchain connection

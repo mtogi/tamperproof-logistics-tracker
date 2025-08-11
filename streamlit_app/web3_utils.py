@@ -297,7 +297,7 @@ class Web3Manager:
             
             # Prepare transaction details
             tx_details = {
-                'hash': tx_hash.hex(),
+                'hash': self.w3.to_hex(tx_hash),
                 'block_number': receipt.blockNumber,
                 'gas_used': receipt.gasUsed,
                 'gas_limit': transaction['gas'],
